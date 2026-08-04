@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campo Minado — PlayHub</title>
+<script src="../assets/icons.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='rgb(15,23,42)'/><g fill='none' stroke='rgb(37,99,235)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'><rect x='20' y='62' width='60' height='24' rx='10'/><path d='M50 62V32'/><circle cx='50' cy='20' r='10'/></g><circle cx='33' cy='75' r='4' fill='rgb(34,197,94)'/><circle cx='67' cy='75' r='4' fill='rgb(34,197,94)'/></svg>">
+<script src="../assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0f172a">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/sfx.js" defer></script>
+<script src="../assets/pwa.js" defer></script>
+<script src="../assets/share.js" defer></script>
+<style>
+  .minegrid {
+    display: grid;
+    gap: 3px;
+    background: var(--bg-alt);
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    user-select: none;
+  }
+  .mtile {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    border-radius: 5px;
+    background: linear-gradient(160deg, var(--card), var(--card-hover));
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .mtile:hover:not(.revealed) { border-color: var(--accent); }
+  .mtile.revealed {
+    background: var(--bg-alt);
+    cursor: default;
+  }
+  .mtile.mine {
+    background: var(--accent2);
+    color: #1a1a2e;
+    box-shadow: 0 0 14px var(--accent2);
+  }
+  .mtile.flag { color: var(--accent2); text-shadow: 0 0 8px rgba(220, 38, 38, 0.6); }
+  .mtile.n1 { color: #2563eb; text-shadow: 0 0 6px rgba(37, 99, 235, 0.6); }
+  .mtile.n2 { color: #22c55e; text-shadow: 0 0 6px rgba(34, 197, 94, 0.55); }
+  .mtile.n3 { color: #dc2626; text-shadow: 0 0 6px rgba(220, 38, 38, 0.55); }
+  .mtile.n4 { color: #7c3aed; text-shadow: 0 0 6px rgba(124, 58, 237, 0.55); }
+  .mtile.n5 { color: #f97316; text-shadow: 0 0 6px rgba(249, 115, 22, 0.5); }
+  .mtile.n6 { color: #06b6d4; text-shadow: 0 0 6px rgba(6, 182, 212, 0.55); }
+  .mtile.n7 { color: #ffffff; text-shadow: 0 0 4px rgba(255, 255, 255, 0.4); }
+  .mtile.n8 { color: #94a3b8; }
+
+  #resultMsgM {
+    display: none;
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .difficulty-row { display: flex; gap: 0.6rem; }
+  .difficulty-row button.active {
+    border-color: var(--accent);
+    color: var(--accent3);
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><span class="dot"></span>Play<span class="grad">Hub</span></a>
+    <div class="header-actions">
+      <a class="back-link" href="../about.html">Sobre</a>
+      <a class="back-link" href="../index.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Voltar ao início</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="game-shell">
+      <h1><svg class="h1-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="14" r="7" fill="currentColor" fill-opacity="0.2"/><circle cx="11" cy="14" r="7"/><path d="M11 7V4M8.5 4h5"/><path d="M16 6.5l1.8-1.8M16 6.5l2.2-.8"/><circle cx="19" cy="3.6" r="1.3" fill="currentColor" stroke="none"/></svg>Campo Minado</h1>
+      <div class="panel">
+        <div class="difficulty-row">
+          <button class="btn secondary active" data-level="easy">Fácil (9x9, 10 minas)</button>
+          <button class="btn secondary" data-level="medium">Médio (12x12, 20 minas)</button>
+          <button class="btn secondary" data-level="hard">Difícil (16x16, 40 minas)</button>
+        </div>
+        <div class="hud">
+          <div><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="14" r="7"/><path d="M11 7V4M8.5 4h5"/><path d="M16 6.5l1.8-1.8M16 6.5l2.2-.8"/><circle cx="19" cy="3.6" r="1.3" fill="currentColor" stroke="none"/></svg>Minas restantes: <strong id="mineCount">0</strong></div>
+          <div><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Tempo: <strong id="timer">0</strong>s</div>
+          <div><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z"/><path d="M7 4.5H4.2a2.8 2.8 0 0 0 2.8 4.6M17 4.5h2.8a2.8 2.8 0 0 1-2.8 4.6"/><path d="M12 13v3.5"/><path d="M8.5 20.5h7"/><path d="M9.5 16.5h5v4h-5z"/></svg>Recorde: <strong id="bestTime">—</strong></div>
+        </div>
+        <div class="minegrid" id="minegrid"></div>
+        <div id="resultMsgM"></div>
+        <div class="controls-row">
+          <button class="btn" id="restartBtn">Novo jogo</button>
+          <button class="btn secondary" id="shareBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Compartilhar</button>
+        </div>
+      </div>
+      <p class="hint">Clique esquerdo para revelar uma célula. Clique direito (ou toque longo no celular) para marcar/desmarcar uma bandeira. Revele todas as células sem minas para vencer.</p>
+    </div>
+  </main>
+
+  <footer>Feito com HTML, CSS e JavaScript puros · PlayHub</footer>
+
+<script>
+const minegrid = document.getElementById('minegrid');
+const mineCountEl = document.getElementById('mineCount');
+const timerEl = document.getElementById('timer');
+const bestTimeEl = document.getElementById('bestTime');
+const resultMsgM = document.getElementById('resultMsgM');
+const restartBtn = document.getElementById('restartBtn');
+const difficultyBtns = document.querySelectorAll('.difficulty-row button');
+
+const LEVELS = {
+  easy:   { rows: 9,  cols: 9,  mines: 10 },
+  medium: { rows: 12, cols: 12, mines: 20 },
+  hard:   { rows: 16, cols: 16, mines: 40 }
+};
+
+let level = 'easy';
+let rows, cols, mineTotal;
+let board;        // 2D array of {mine, revealed, flagged, adjacent}
+let firstClick;
+let gameOver;
+let flagsPlaced;
+let revealedCount;
+let timerInterval;
+let seconds;
+
+function setLevel(lv) {
+  level = lv;
+  difficultyBtns.forEach(b => b.classList.toggle('active', b.dataset.level === lv));
+  init();
+}
+
+function init() {
+  const cfg = LEVELS[level];
+  rows = cfg.rows; cols = cfg.cols; mineTotal = cfg.mines;
+
+  board = Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => ({ mine: false, revealed: false, flagged: false, adjacent: 0 }))
+  );
+
+  firstClick = true;
+  gameOver = false;
+  flagsPlaced = 0;
+  revealedCount = 0;
+  seconds = 0;
+  clearInterval(timerInterval);
+  timerEl.textContent = seconds;
+  mineCountEl.textContent = mineTotal;
+  resultMsgM.style.display = 'none';
+
+  minegrid.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
+  minegrid.style.gridTemplateRows = `repeat(${rows}, 32px)`;
+
+  const best = localStorage.getItem('mines_best_' + level);
+  bestTimeEl.textContent = best ? best + 's' : '—';
+
+  render();
+}
+
+function placeMines(excludeR, excludeC) {
+  let placed = 0;
+  while (placed < mineTotal) {
+    const r = Math.floor(Math.random() * rows);
+    const c = Math.floor(Math.random() * cols);
+    if (board[r][c].mine) continue;
+    if (Math.abs(r - excludeR) <= 1 && Math.abs(c - excludeC) <= 1) continue;
+    board[r][c].mine = true;
+    placed++;
+  }
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (board[r][c].mine) continue;
+      board[r][c].adjacent = countAdjacentMines(r, c);
+    }
+  }
+}
+
+function countAdjacentMines(r, c) {
+  let count = 0;
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc].mine) count++;
+    }
+  }
+  return count;
+}
+
+function render() {
+  minegrid.innerHTML = '';
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = board[r][c];
+      const el = document.createElement('div');
+      el.className = 'mtile';
+      if (cell.revealed) {
+        el.classList.add('revealed');
+        if (cell.mine) {
+          el.classList.add('mine');
+          el.innerHTML = iconSVG('mine');
+        } else if (cell.adjacent > 0) {
+          el.classList.add('n' + cell.adjacent);
+          el.textContent = cell.adjacent;
+        }
+      } else if (cell.flagged) {
+        el.classList.add('flag');
+        el.innerHTML = iconSVG('flag');
+      }
+      el.addEventListener('click', () => onReveal(r, c));
+      el.addEventListener('contextmenu', (e) => { e.preventDefault(); onFlag(r, c); });
+      minegrid.appendChild(el);
+    }
+  }
+}
+
+function onReveal(r, c) {
+  if (gameOver) return;
+  const cell = board[r][c];
+  if (cell.revealed || cell.flagged) return;
+
+  if (firstClick) {
+    placeMines(r, c);
+    firstClick = false;
+    timerInterval = setInterval(() => {
+      seconds++;
+      timerEl.textContent = seconds;
+    }, 1000);
+  }
+
+  if (cell.mine) {
+    cell.revealed = true;
+    endGame(false);
+    return;
+  }
+
+  SFX.click();
+  floodReveal(r, c);
+  render();
+  checkWin();
+}
+
+function floodReveal(r, c) {
+  const cell = board[r][c];
+  if (cell.revealed || cell.flagged) return;
+  cell.revealed = true;
+  revealedCount++;
+
+  if (cell.adjacent === 0) {
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !board[nr][nc].mine) {
+          floodReveal(nr, nc);
+        }
+      }
+    }
+  }
+}
+
+function onFlag(r, c) {
+  if (gameOver) return;
+  const cell = board[r][c];
+  if (cell.revealed) return;
+  cell.flagged = !cell.flagged;
+  flagsPlaced += cell.flagged ? 1 : -1;
+  mineCountEl.textContent = mineTotal - flagsPlaced;
+  SFX.move();
+  render();
+}
+
+function checkWin() {
+  const totalCells = rows * cols;
+  if (revealedCount === totalCells - mineTotal) {
+    endGame(true);
+  }
+}
+
+function endGame(won) {
+  gameOver = true;
+  clearInterval(timerInterval);
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      if (board[r][c].mine) board[r][c].revealed = true;
+  render();
+
+  if (won) {
+    SFX.win();
+    const bestKey = 'mines_best_' + level;
+    const prevBest = Number(localStorage.getItem(bestKey));
+    if (!prevBest || seconds < prevBest) {
+      localStorage.setItem(bestKey, seconds);
+      bestTimeEl.textContent = seconds + 's';
+    }
+  } else {
+    SFX.gameover();
+  }
+
+  resultMsgM.style.color = won ? 'var(--accent3)' : 'var(--accent2)';
+  resultMsgM.innerHTML = won
+    ? iconSVG('starWin') + `Você venceu em ${seconds}s!`
+    : iconSVG('burstLose') + 'Você pisou em uma mina!';
+  resultMsgM.style.display = 'block';
+}
+
+difficultyBtns.forEach(btn => {
+  btn.addEventListener('click', () => setLevel(btn.dataset.level));
+});
+restartBtn.addEventListener('click', init);
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const status = gameOver ? (revealedCount === rows * cols - mineTotal ? `venci em ${seconds}s` : 'explodi numa mina') : `estou em ${seconds}s`;
+  SHARE.score(`Campo Minado (${level}) no PlayHub: ${status}!`);
+});
+
+init();
+</script>
+</body>
+</html>

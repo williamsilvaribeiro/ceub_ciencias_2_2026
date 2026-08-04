@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fantasy World Cup — PlayHub</title>
+<script src="../assets/icons.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='rgb(15,23,42)'/><g fill='none' stroke='rgb(37,99,235)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'><rect x='20' y='62' width='60' height='24' rx='10'/><path d='M50 62V32'/><circle cx='50' cy='20' r='10'/></g><circle cx='33' cy='75' r='4' fill='rgb(34,197,94)'/><circle cx='67' cy='75' r='4' fill='rgb(34,197,94)'/></svg>">
+<script src="../assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0f172a">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/sfx.js" defer></script>
+<script src="../assets/pwa.js" defer></script>
+<script src="../assets/share.js" defer></script>
+<style>
+  .wc-shell { width: 100%; max-width: 720px; }
+  .wc-progress {
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .wc-progress strong { color: var(--accent3); }
+  .roulette-team {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin: 0.4rem 0 1rem;
+  }
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.6rem;
+    width: 100%;
+  }
+  .player-card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    cursor: pointer;
+    transition: 0.15s;
+    font-family: var(--font-body);
+  }
+  .player-card:hover:not(.drafted) { border-color: var(--accent); transform: translateY(-2px); }
+  .player-card.drafted { opacity: 0.3; cursor: not-allowed; }
+  .player-card .pname { font-size: 1.1rem; color: var(--text); line-height: 1.2; }
+  .player-card .pmeta { display: flex; justify-content: space-between; font-size: 0.95rem; color: var(--text-dim); margin-top: 0.3rem; }
+  .player-card .povr { color: var(--accent3); font-weight: 700; }
+  .squad-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .squad-list .p-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+  }
+  .squad-list .p-chip.bench { opacity: 0.65; }
+  .squad-list .p-chip .p-pos { color: var(--accent); font-size: 0.8rem; }
+  .vs-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  .vs-row .side { flex: 1; }
+  .vs-row .side .team-name { color: var(--text); font-size: 0.75rem; margin-bottom: 0.4rem; }
+  .vs-row .side .team-ovr { color: var(--accent3); font-size: 1.1rem; }
+  .vs-row .vs-x { color: var(--accent2); font-size: 1.1rem; }
+  .tactic-row { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+  .score-big {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    text-align: center;
+    color: var(--text);
+  }
+  .event-log {
+    width: 100%;
+    max-height: 260px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+  }
+  .event-log .ev { padding: 0.35rem 0.7rem; border-radius: 8px; background: var(--bg-alt); }
+  .event-log .ev.goal-player { border-left: 3px solid var(--accent3); color: var(--text); }
+  .event-log .ev.goal-cpu { border-left: 3px solid var(--accent2); color: var(--text); }
+  .event-log .ev.flavor { color: var(--text-dim); font-size: 1rem; }
+  .sub-panel {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .sub-col h4 { font-family: var(--font-display); font-size: 0.65rem; color: var(--accent); margin: 0 0 0.5rem; text-align: center; }
+  .sub-col .p-chip { cursor: pointer; }
+  .sub-col .p-chip.selected { border-color: var(--accent3); box-shadow: 0 0 10px rgba(var(--accent3-rgb), 0.4); }
+  .hidden { display: none !important; }
+
+  .formation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.8rem;
+    width: 100%;
+  }
+  .formation-card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .formation-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .formation-card .f-name { font-family: var(--font-display); font-size: 1rem; color: var(--accent3); margin: 0.6rem 0 0.5rem; }
+  .formation-card .f-breakdown { font-family: var(--font-body); font-size: 1rem; color: var(--text-dim); }
+
+  /* ---- pitch / formation visualization ---- */
+  .pitch-mini {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: repeating-linear-gradient(0deg, #1c7a3e, #1c7a3e 10%, #1f8745 10%, #1f8745 20%);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.25);
+    overflow: hidden;
+  }
+  .pitch-mini .pm-line { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid rgba(255,255,255,0.35); }
+  .pitch-mini .pm-circle { position: absolute; left: 50%; top: 50%; width: 26%; aspect-ratio: 1; border: 1px solid rgba(255,255,255,0.35); border-radius: 50%; transform: translate(-50%,-50%); }
+  .pitch-mini .pm-dot {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    background: #fff; box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
+    transform: translate(-50%, -50%);
+  }
+
+  .pitch-wrap { width: 100%; max-width: 380px; margin: 0 auto; }
+  .pitch {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: repeating-linear-gradient(0deg, #1c7a3e, #1c7a3e 10%, #1f8745 10%, #1f8745 20%);
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.25);
+    overflow: hidden;
+  }
+  .pitch .p-line { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid rgba(255,255,255,0.35); }
+  .pitch .p-circle { position: absolute; left: 50%; top: 50%; width: 30%; aspect-ratio: 1; border: 1px solid rgba(255,255,255,0.35); border-radius: 50%; transform: translate(-50%,-50%); }
+  .pitch .p-box-top, .pitch .p-box-bottom { position: absolute; left: 25%; width: 50%; height: 12%; border: 1px solid rgba(255,255,255,0.35); }
+  .pitch .p-box-top { top: 0; border-top: none; }
+  .pitch .p-box-bottom { bottom: 0; border-bottom: none; }
+
+  .pitch-slot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    width: 22%;
+  }
+  .pitch-slot .ps-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(15,23,42,0.78);
+    border: 2px dashed rgba(255,255,255,0.55);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 0.5rem;
+    color: #e2e8f0;
+  }
+  .pitch-slot.filled .ps-dot { background: var(--accent3); border: 2px solid var(--accent3); color: #04140a; font-size: 0.62rem; }
+  .pitch-slot.clickable { cursor: pointer; }
+  .pitch-slot.clickable .ps-dot:hover { border-color: var(--accent); }
+  .pitch-slot.active .ps-dot { border-color: var(--accent2); box-shadow: 0 0 0 4px rgba(var(--accent2-rgb), 0.3); animation: slot-pulse 1s ease-in-out infinite; }
+  @keyframes slot-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  .pitch-slot .ps-name {
+    font-family: var(--font-body);
+    font-size: 0.58rem;
+    color: #f1f5f9;
+    text-align: center;
+    max-width: 74px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: rgba(15,23,42,0.7);
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+
+  .pos-breakdown {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--text-dim);
+  }
+  .pos-breakdown span.full { color: var(--accent2); }
+  .pos-breakdown span.ok { color: var(--accent3); }
+
+  .player-card.pos-full { opacity: 0.25; cursor: not-allowed; }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    color: var(--accent2);
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.6rem;
+  }
+  .live-badge .dot-live {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent2);
+    animation: live-pulse 1s ease-in-out infinite;
+  }
+  @keyframes live-pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
+
+  .group-table-wrap { width: 100%; overflow-x: auto; }
+  .group-table { width: 100%; border-collapse: collapse; font-family: var(--font-body); font-size: 1.05rem; }
+  .group-table th, .group-table td { padding: 0.45rem 0.6rem; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .group-table th:first-child, .group-table td:first-child { text-align: left; }
+  .group-table th { color: var(--text-dim); font-size: 0.95rem; font-weight: 400; }
+  .group-table tr.you td { color: var(--accent3); font-weight: 700; }
+  .event-log .ev { display: flex; align-items: center; gap: 0.5rem; }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><span class="dot"></span>Play<span class="grad">Hub</span></a>
+    <div class="header-actions">
+      <a class="back-link" href="../about.html">Sobre</a>
+      <a class="back-link" href="../index.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Voltar ao início</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="game-shell">
+      <h1><svg class="h1-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z" fill="currentColor" fill-opacity="0.22"/><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z"/><path d="M7 4.5H4.2a2.8 2.8 0 0 0 2.8 4.6M17 4.5h2.8a2.8 2.8 0 0 1-2.8 4.6"/><path d="M12 13v3.5"/><path d="M8.5 20.5h7"/><path d="M9.5 16.5h5v4h-5z"/></svg>Fantasy World Cup</h1>
+
+      <!-- FORMATION SCREEN -->
+      <div class="panel wc-shell" id="screenFormation">
+        <div class="wc-progress">Escolha a formação do seu time</div>
+        <div class="formation-grid" id="formationGrid"></div>
+        <p class="hint">A formação define quantos jogadores de cada posição você pode escalar como titular. As 5 reservas podem ser de qualquer posição.</p>
+      </div>
+
+      <!-- DRAFT SCREEN -->
+      <div class="panel wc-shell hidden" id="screenDraft">
+        <div class="wc-progress" id="draftProgress">Escolha seus 11 titulares</div>
+        <div class="pos-breakdown" id="posBreakdown"></div>
+        <div class="pitch-wrap" id="draftPitchWrap"></div>
+        <div class="wc-progress" id="slotHint" style="font-size: 0.95rem;"></div>
+        <div class="controls-row">
+          <button class="btn" id="spinBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Girar Roleta</button>
+        </div>
+        <div class="roulette-team" id="rouletteTeam"></div>
+        <div class="player-grid" id="playerGrid"></div>
+        <p class="hint">Gire a roleta para sortear uma seleção histórica real. Cada vaga do campo é uma posição específica (ponta, volante, meia, lateral...) — só entram jogadores compatíveis com a vaga selecionada. Clique num jogador já escalado para tirá-lo do campo e escolher outro.</p>
+      </div>
+
+      <!-- TOURNAMENT HUB SCREEN -->
+      <div class="panel wc-shell hidden" id="screenPreMatch">
+        <div class="wc-progress">Seu Dream Team está pronto!</div>
+        <div class="pitch-wrap" id="preMatchPitch"></div>
+        <div class="wc-progress" style="font-size: 0.9rem; margin-top: 0.6rem;">Reservas</div>
+        <div class="squad-list" id="finalSquadList"></div>
+        <div class="wc-progress" id="hubTitle" style="margin-top: 0.8rem"></div>
+        <div class="group-table-wrap" id="hubTableWrap"></div>
+        <div class="controls-row">
+          <button class="btn" id="hubActionBtn"></button>
+        </div>
+      </div>
+
+      <!-- MATCH SCREEN -->
+      <div class="panel wc-shell hidden" id="screenMatch">
+        <div class="vs-row" id="vsRow"></div>
+        <div class="score-big" id="scoreBig">0 x 0</div>
+        <div class="live-badge hidden" id="liveBadge"><span class="dot-live"></span> AO VIVO — BOLA ROLANDO</div>
+        <div id="tacticArea">
+          <div class="wc-progress" id="tacticLabel">Escolha a postura do 1º tempo</div>
+          <div class="tactic-row" id="tacticRow">
+            <button class="btn secondary" data-tactic="of"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21L10 14M21 3L14 10M14 14l7 7M10 10L3 3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>Ofensiva</button>
+            <button class="btn secondary active" data-tactic="eq"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 7h12M6 7l-3 6a3 3 0 0 0 6 0L6 7zM18 7l-3 6a3 3 0 0 0 6 0L18 7z"/></svg>Equilibrada</button>
+            <button class="btn secondary" data-tactic="def"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg>Defensiva</button>
+          </div>
+          <div class="controls-row">
+            <button class="btn" id="playHalfBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M6 4l14 8-14 8V4z"/></svg>Jogar 1º Tempo</button>
+          </div>
+        </div>
+        <div class="event-log" id="eventLog"></div>
+
+        <div id="subArea" class="hidden" style="width:100%">
+          <div class="wc-progress" id="subProgress">Substituições: 0/5</div>
+          <div class="sub-panel">
+            <div class="sub-col">
+              <h4>TITULARES (clique p/ sair)</h4>
+              <div class="squad-list" id="subStartersList"></div>
+            </div>
+            <div class="sub-col">
+              <h4>RESERVAS (clique p/ entrar)</h4>
+              <div class="squad-list" id="subBenchList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-row hidden" id="matchControls">
+          <button class="btn" id="continueBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M6 4l14 8-14 8V4z"/></svg>Continuar</button>
+          <button class="btn secondary" id="shareBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Compartilhar</button>
+          <button class="btn secondary" id="newSquadBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 1 0 18.8 15.5"/><path d="M20 5v6h-6"/></svg>Abandonar Torneio</button>
+        </div>
+      </div>
+
+      <p class="hint">Baseado em elencos reais de Copas do Mundo históricas. Overalls calibrados por desempenho/reputação real dos jogadores — em expansão contínua.</p>
+    </div>
+  </main>
+
+  <footer>Feito com HTML, CSS e JavaScript puros · PlayHub</footer>
+
+<script>
+// ---------------------------------------------------------------------------
+// DATA — real World Cup-winning squads. Starters listed first (11), then 5
+// bench players. Overalls are a hand-calibrated 1-99 scale based on real
+// career reputation/performance (FIFA-style), not an official rating.
+// NOTE: Uruguay 1950's back line is lower-confidence (less documented) —
+// flagged for follow-up once a verified squads dataset is plugged in.
+// ---------------------------------------------------------------------------
+const SQUADS = [
+  { id: 'br1970', label: 'Brasil 1970', flag: '🇧🇷', players: [
+    {name:'Félix', pos:'GOL', ovr:78}, {name:'Carlos Alberto', pos:'ZAG', ovr:88}, {name:'Brito', pos:'ZAG', ovr:82},
+    {name:'Piazza', pos:'ZAG', ovr:81}, {name:'Everaldo', pos:'ZAG', ovr:83}, {name:'Clodoaldo', pos:'MEI', ovr:85},
+    {name:'Gérson', pos:'MEI', ovr:89}, {name:'Jairzinho', pos:'ATA', ovr:92}, {name:'Pelé', pos:'ATA', ovr:99},
+    {name:'Tostão', pos:'ATA', ovr:87}, {name:'Rivelino', pos:'MEI', ovr:90},
+    {name:'Leão', pos:'GOL', ovr:76}, {name:'Marco Antônio', pos:'ZAG', ovr:78}, {name:'Edu', pos:'ATA', ovr:79},
+    {name:'Paulo César Caju', pos:'MEI', ovr:80}, {name:'Roberto', pos:'ATA', ovr:77}
+  ]},
+  { id: 'br2002', label: 'Brasil 2002', flag: '🇧🇷', players: [
+    {name:'Marcos', pos:'GOL', ovr:84}, {name:'Lúcio', pos:'ZAG', ovr:89}, {name:'Roque Júnior', pos:'ZAG', ovr:82},
+    {name:'Edmílson', pos:'ZAG', ovr:83}, {name:'Cafu', pos:'MEI', ovr:90}, {name:'Roberto Carlos', pos:'MEI', ovr:91},
+    {name:'Gilberto Silva', pos:'MEI', ovr:85}, {name:'Kléberson', pos:'MEI', ovr:82}, {name:'Ronaldinho', pos:'ATA', ovr:93},
+    {name:'Rivaldo', pos:'ATA', ovr:92}, {name:'Ronaldo', pos:'ATA', ovr:97},
+    {name:'Dida', pos:'GOL', ovr:83}, {name:'Belletti', pos:'ZAG', ovr:78}, {name:'Juan', pos:'ZAG', ovr:80},
+    {name:'Vampeta', pos:'MEI', ovr:76}, {name:'Denílson', pos:'ATA', ovr:79}
+  ]},
+  { id: 'ar1986', label: 'Argentina 1986', flag: '🇦🇷', players: [
+    {name:'Nery Pumpido', pos:'GOL', ovr:80}, {name:'José Luis Cuciuffo', pos:'ZAG', ovr:79}, {name:'Oscar Ruggeri', pos:'ZAG', ovr:84},
+    {name:'José Luis Brown', pos:'ZAG', ovr:81}, {name:'Julio Olarticoechea', pos:'ZAG', ovr:80}, {name:'Sergio Batista', pos:'MEI', ovr:79},
+    {name:'Ricardo Giusti', pos:'MEI', ovr:78}, {name:'Héctor Enrique', pos:'MEI', ovr:79}, {name:'Jorge Valdano', pos:'ATA', ovr:87},
+    {name:'Diego Maradona', pos:'ATA', ovr:99}, {name:'Jorge Burruchaga', pos:'ATA', ovr:84},
+    {name:'Luis Islas', pos:'GOL', ovr:75}, {name:'Marcelo Trobbiani', pos:'MEI', ovr:74}, {name:'Carlos Tapia', pos:'MEI', ovr:74},
+    {name:'Pedro Pasculli', pos:'ATA', ovr:76}, {name:'Nestor Clausen', pos:'ZAG', ovr:74}
+  ]},
+  { id: 'ar2022', label: 'Argentina 2022', flag: '🇦🇷', players: [
+    {name:'Emiliano Martínez', pos:'GOL', ovr:88}, {name:'Nahuel Molina', pos:'ZAG', ovr:84}, {name:'Cristian Romero', pos:'ZAG', ovr:87},
+    {name:'Nicolás Otamendi', pos:'ZAG', ovr:83}, {name:'Nicolás Tagliafico', pos:'ZAG', ovr:83}, {name:'Rodrigo De Paul', pos:'MEI', ovr:86},
+    {name:'Enzo Fernández', pos:'MEI', ovr:85}, {name:'Alexis Mac Allister', pos:'MEI', ovr:85}, {name:'Ángel Di María', pos:'ATA', ovr:87},
+    {name:'Lionel Messi', pos:'ATA', ovr:99}, {name:'Julián Álvarez', pos:'ATA', ovr:85},
+    {name:'Gerónimo Rulli', pos:'GOL', ovr:79}, {name:'Lisandro Martínez', pos:'ZAG', ovr:82}, {name:'Marcos Acuña', pos:'ZAG', ovr:81},
+    {name:'Leandro Paredes', pos:'MEI', ovr:80}, {name:'Lautaro Martínez', pos:'ATA', ovr:84}
+  ]},
+  { id: 'de2014', label: 'Alemanha 2014', flag: '🇩🇪', players: [
+    {name:'Manuel Neuer', pos:'GOL', ovr:93}, {name:'Philipp Lahm', pos:'ZAG', ovr:90}, {name:'Jérôme Boateng', pos:'ZAG', ovr:87},
+    {name:'Mats Hummels', pos:'ZAG', ovr:88}, {name:'Benedikt Höwedes', pos:'ZAG', ovr:82}, {name:'Bastian Schweinsteiger', pos:'MEI', ovr:88},
+    {name:'Toni Kroos', pos:'MEI', ovr:90}, {name:'Sami Khedira', pos:'MEI', ovr:85}, {name:'Thomas Müller', pos:'ATA', ovr:90},
+    {name:'Miroslav Klose', pos:'ATA', ovr:86}, {name:'Mesut Özil', pos:'ATA', ovr:88},
+    {name:'Ron-Robert Zieler', pos:'GOL', ovr:76}, {name:'Shkodran Mustafi', pos:'ZAG', ovr:78}, {name:'Erik Durm', pos:'ZAG', ovr:76},
+    {name:'André Schürrle', pos:'ATA', ovr:82}, {name:'Mario Götze', pos:'ATA', ovr:87}
+  ]},
+  { id: 'fr1998', label: 'França 1998', flag: '🇫🇷', players: [
+    {name:'Fabien Barthez', pos:'GOL', ovr:87}, {name:'Lilian Thuram', pos:'ZAG', ovr:88}, {name:'Marcel Desailly', pos:'ZAG', ovr:89},
+    {name:'Laurent Blanc', pos:'ZAG', ovr:87}, {name:'Bixente Lizarazu', pos:'ZAG', ovr:85}, {name:'Didier Deschamps', pos:'MEI', ovr:84},
+    {name:'Emmanuel Petit', pos:'MEI', ovr:85}, {name:'Christian Karembeu', pos:'MEI', ovr:80}, {name:'Zinédine Zidane', pos:'MEI', ovr:96},
+    {name:"Stéphane Guivarc'h", pos:'ATA', ovr:76}, {name:'Youri Djorkaeff', pos:'ATA', ovr:87},
+    {name:'Bernard Lama', pos:'GOL', ovr:78}, {name:'Alain Boghossian', pos:'MEI', ovr:77}, {name:'Robert Pirès', pos:'ATA', ovr:86},
+    {name:'Thierry Henry', pos:'ATA', ovr:88}, {name:'Vincent Candela', pos:'ZAG', ovr:76}
+  ]},
+  { id: 'uy1950', label: 'Uruguai 1950', flag: '🇺🇾', players: [
+    {name:'Roque Máspoli', pos:'GOL', ovr:80}, {name:'Matías González', pos:'ZAG', ovr:76}, {name:'Schubert Gambetta', pos:'ZAG', ovr:78},
+    {name:'Eusebio Tejera', pos:'ZAG', ovr:76}, {name:'Washington Ortuño', pos:'ZAG', ovr:75}, {name:'Obdulio Varela', pos:'MEI', ovr:87},
+    {name:'Julio Pérez', pos:'MEI', ovr:78}, {name:'Ernesto Vidal', pos:'MEI', ovr:79}, {name:'Alcides Ghiggia', pos:'ATA', ovr:88},
+    {name:'Juan Alberto Schiaffino', pos:'ATA', ovr:89}, {name:'Óscar Míguez', pos:'ATA', ovr:84},
+    {name:'William Martínez', pos:'GOL', ovr:72}, {name:'Carlos Romero', pos:'ZAG', ovr:73}, {name:'Rubén Camejo', pos:'MEI', ovr:73},
+    {name:'José Santamaría', pos:'ZAG', ovr:75}, {name:'Ruben Morán', pos:'ATA', ovr:74}
+  ]},
+  { id: 'it1982', label: 'Itália 1982', flag: '🇮🇹', players: [
+    {name:'Dino Zoff', pos:'GOL', ovr:85}, {name:'Claudio Gentile', pos:'ZAG', ovr:87}, {name:'Fulvio Collovati', pos:'ZAG', ovr:80},
+    {name:'Gaetano Scirea', pos:'ZAG', ovr:89}, {name:'Antonio Cabrini', pos:'ZAG', ovr:85}, {name:'Gabriele Oriali', pos:'MEI', ovr:79},
+    {name:'Marco Tardelli', pos:'MEI', ovr:87}, {name:'Giancarlo Antognoni', pos:'MEI', ovr:88}, {name:'Bruno Conti', pos:'ATA', ovr:87},
+    {name:'Paolo Rossi', pos:'ATA', ovr:92}, {name:'Francesco Graziani', pos:'ATA', ovr:83},
+    {name:'Ivano Bordon', pos:'GOL', ovr:75}, {name:'Giuseppe Bergomi', pos:'ZAG', ovr:82}, {name:'Alessandro Altobelli', pos:'ATA', ovr:85},
+    {name:'Franco Causio', pos:'MEI', ovr:81}, {name:'Beppe Dossena', pos:'MEI', ovr:76}
+  ]},
+  { id: 'fr2018', label: 'França 2018', flag: '🇫🇷', players: [
+    {name:'Hugo Lloris', pos:'GOL', ovr:85}, {name:'Benjamin Pavard', pos:'ZAG', ovr:81}, {name:'Raphaël Varane', pos:'ZAG', ovr:87},
+    {name:'Samuel Umtiti', pos:'ZAG', ovr:82}, {name:'Lucas Hernández', pos:'ZAG', ovr:83}, {name:"N'Golo Kanté", pos:'MEI', ovr:87},
+    {name:'Paul Pogba', pos:'MEI', ovr:88}, {name:'Blaise Matuidi', pos:'MEI', ovr:82}, {name:'Kylian Mbappé', pos:'ATA', ovr:90},
+    {name:'Antoine Griezmann', pos:'ATA', ovr:89}, {name:'Olivier Giroud', pos:'ATA', ovr:80},
+    {name:'Steve Mandanda', pos:'GOL', ovr:78}, {name:'Presnel Kimpembe', pos:'ZAG', ovr:80}, {name:'Corentin Tolisso', pos:'MEI', ovr:79},
+    {name:'Nabil Fekir', pos:'ATA', ovr:80}, {name:'Ousmane Dembélé', pos:'ATA', ovr:82}
+  ]},
+  { id: 'de1990', label: 'Alemanha 1990', flag: '🇩🇪', players: [
+    {name:'Bodo Illgner', pos:'GOL', ovr:83}, {name:'Thomas Berthold', pos:'ZAG', ovr:80}, {name:'Klaus Augenthaler', pos:'ZAG', ovr:85},
+    {name:'Jürgen Kohler', pos:'ZAG', ovr:84}, {name:'Guido Buchwald', pos:'ZAG', ovr:83}, {name:'Andreas Brehme', pos:'ZAG', ovr:86},
+    {name:'Thomas Häßler', pos:'MEI', ovr:85}, {name:'Lothar Matthäus', pos:'MEI', ovr:92}, {name:'Pierre Littbarski', pos:'MEI', ovr:84},
+    {name:'Jürgen Klinsmann', pos:'ATA', ovr:90}, {name:'Rudi Völler', pos:'ATA', ovr:88},
+    {name:'Eike Immel', pos:'GOL', ovr:74}, {name:'Stefan Reuter', pos:'ZAG', ovr:78}, {name:'Olaf Thon', pos:'MEI', ovr:79},
+    {name:'Uwe Bein', pos:'MEI', ovr:77}, {name:'Karlheinz Riedle', pos:'ATA', ovr:80}
+  ]},
+  { id: 'en1966', label: 'Inglaterra 1966', flag: '🇬🇧', players: [
+    {name:'Gordon Banks', pos:'GOL', ovr:86}, {name:'George Cohen', pos:'ZAG', ovr:79}, {name:'Jack Charlton', pos:'ZAG', ovr:84},
+    {name:'Bobby Moore', pos:'ZAG', ovr:90}, {name:'Ray Wilson', pos:'ZAG', ovr:80}, {name:'Alan Ball', pos:'MEI', ovr:85},
+    {name:'Nobby Stiles', pos:'MEI', ovr:81}, {name:'Bobby Charlton', pos:'MEI', ovr:91}, {name:'Martin Peters', pos:'MEI', ovr:83},
+    {name:'Roger Hunt', pos:'ATA', ovr:84}, {name:'Geoff Hurst', pos:'ATA', ovr:87},
+    {name:'Ron Springett', pos:'GOL', ovr:72}, {name:'Jimmy Greaves', pos:'ATA', ovr:86}, {name:'Terry Paine', pos:'MEI', ovr:76},
+    {name:'Ian Callaghan', pos:'MEI', ovr:75}, {name:'George Eastham', pos:'MEI', ovr:74}
+  ]},
+  { id: 'es2010', label: 'Espanha 2010', flag: '🇪🇸', players: [
+    {name:'Iker Casillas', pos:'GOL', ovr:91}, {name:'Sergio Ramos', pos:'ZAG', ovr:89}, {name:'Gerard Piqué', pos:'ZAG', ovr:87},
+    {name:'Carles Puyol', pos:'ZAG', ovr:88}, {name:'Joan Capdevila', pos:'ZAG', ovr:79}, {name:'Sergio Busquets', pos:'MEI', ovr:84},
+    {name:'Xabi Alonso', pos:'MEI', ovr:87}, {name:'Xavi', pos:'MEI', ovr:93}, {name:'Andrés Iniesta', pos:'MEI', ovr:94},
+    {name:'Pedro', pos:'ATA', ovr:82}, {name:'David Villa', pos:'ATA', ovr:89},
+    {name:'Pepe Reina', pos:'GOL', ovr:82}, {name:'Cesc Fàbregas', pos:'MEI', ovr:86}, {name:'David Silva', pos:'MEI', ovr:87},
+    {name:'Fernando Torres', pos:'ATA', ovr:85}, {name:'Jesús Navas', pos:'MEI', ovr:78}
+  ]},
+  { id: 'ar1978', label: 'Argentina 1978', flag: '🇦🇷', players: [
+    {name:'Ubaldo Fillol', pos:'GOL', ovr:84}, {name:'Jorge Olguín', pos:'ZAG', ovr:78}, {name:'Daniel Passarella', pos:'ZAG', ovr:88},
+    {name:'Luis Galván', pos:'ZAG', ovr:80}, {name:'Alberto Tarantini', pos:'ZAG', ovr:79}, {name:'Osvaldo Ardiles', pos:'MEI', ovr:83},
+    {name:'Américo Gallego', pos:'MEI', ovr:80}, {name:'René Houseman', pos:'MEI', ovr:79}, {name:'Mario Kempes', pos:'ATA', ovr:90},
+    {name:'Leopoldo Luque', pos:'ATA', ovr:84}, {name:'Daniel Bertoni', pos:'ATA', ovr:82},
+    {name:'Héctor Baley', pos:'GOL', ovr:70}, {name:'Norberto Alonso', pos:'MEI', ovr:77}, {name:'Rubén Ayala', pos:'ATA', ovr:78},
+    {name:'Jorge Valencia', pos:'ZAG', ovr:74}, {name:'Carlos Larrosa', pos:'MEI', ovr:73}
+  ]},
+  { id: 'br1958', label: 'Brasil 1958', flag: '🇧🇷', players: [
+    {name:'Gilmar', pos:'GOL', ovr:85}, {name:'Djalma Santos', pos:'ZAG', ovr:87}, {name:'Bellini', pos:'ZAG', ovr:82},
+    {name:'Orlando', pos:'ZAG', ovr:80}, {name:'Nílton Santos', pos:'ZAG', ovr:88}, {name:'Zito', pos:'MEI', ovr:84},
+    {name:'Didi', pos:'MEI', ovr:89}, {name:'Garrincha', pos:'ATA', ovr:93}, {name:'Vavá', pos:'ATA', ovr:86},
+    {name:'Pelé', pos:'ATA', ovr:96}, {name:'Zagallo', pos:'MEI', ovr:83},
+    {name:'Castilho', pos:'GOL', ovr:74}, {name:'Mauro Ramos', pos:'ZAG', ovr:78}, {name:'Pepe', pos:'ATA', ovr:79},
+    {name:'Julinho', pos:'ATA', ovr:80}, {name:'De Sordi', pos:'ZAG', ovr:75}
+  ]}
+];
+
+const TACTICS = {
+  of:  { label: 'Ofensiva',   atk: 7,  def: -6 },
+  eq:  { label: 'Equilibrada', atk: 0,  def: 0  },
+  def: { label: 'Defensiva',  atk: -6, def: 7  }
+};
+
+// Each formation lists its exact on-pitch slots — a specific named position
+// (ponta, volante, meia, lateral, zagueiro...) plus the broad player-pool
+// category (broad) it draws from and an x/y percentage for the pitch diagram.
+// Broad-category totals per formation match the original GOL/ZAG/MEI/ATA
+// counts, so the existing SQUADS player data (tagged only with broad pos)
+// still works — the user just decides which specific slot each pick fills.
+const FORMATIONS = {
+  '442': { key: '442', label: '4-4-2', slots: [
+    { key: 'GOL', broad: 'GOL', label: 'Goleiro',            short: 'GOL', x: 50, y: 92 },
+    { key: 'LE',  broad: 'ZAG', label: 'Lateral Esquerdo',   short: 'LE',  x: 14, y: 74 },
+    { key: 'ZE',  broad: 'ZAG', label: 'Zagueiro',           short: 'ZAG', x: 37, y: 80 },
+    { key: 'ZD',  broad: 'ZAG', label: 'Zagueiro',           short: 'ZAG', x: 63, y: 80 },
+    { key: 'LD',  broad: 'ZAG', label: 'Lateral Direito',    short: 'LD',  x: 86, y: 74 },
+    { key: 'ME',  broad: 'MEI', label: 'Meia Esquerda',      short: 'ME',  x: 14, y: 46 },
+    { key: 'VOL', broad: 'MEI', label: 'Volante',            short: 'VOL', x: 38, y: 54 },
+    { key: 'MC',  broad: 'MEI', label: 'Meio-Campista',      short: 'MC',  x: 62, y: 54 },
+    { key: 'MD',  broad: 'MEI', label: 'Meia Direita',       short: 'MD',  x: 86, y: 46 },
+    { key: 'CA1', broad: 'ATA', label: 'Centroavante',       short: 'CA',  x: 38, y: 18 },
+    { key: 'CA2', broad: 'ATA', label: 'Centroavante',       short: 'CA',  x: 62, y: 18 },
+  ]},
+  '433': { key: '433', label: '4-3-3', slots: [
+    { key: 'GOL', broad: 'GOL', label: 'Goleiro',            short: 'GOL', x: 50, y: 92 },
+    { key: 'LE',  broad: 'ZAG', label: 'Lateral Esquerdo',   short: 'LE',  x: 14, y: 74 },
+    { key: 'ZE',  broad: 'ZAG', label: 'Zagueiro',           short: 'ZAG', x: 37, y: 80 },
+    { key: 'ZD',  broad: 'ZAG', label: 'Zagueiro',           short: 'ZAG', x: 63, y: 80 },
+    { key: 'LD',  broad: 'ZAG', label: 'Lateral Direito',    short: 'LD',  x: 86, y: 74 },
+    { key: 'VOL', broad: 'MEI', label: 'Volante',            short: 'VOL', x: 50, y: 66 },
+    { key: 'MCE', broad: 'MEI', label: 'Meia Esquerda',      short: 'ME',  x: 27, y: 50 },
+    { key: 'MCD', broad: 'MEI', label: 'Meia Direita',       short: 'MD',  x: 73, y: 50 },
+    { key: 'PE',  broad: 'ATA', label: 'Ponta Esquerda',     short: 'PE',  x: 16, y: 20 },
+    { key: 'CA',  broad: 'ATA', label: 'Centroavante',       short: 'CA',  x: 50, y: 12 },
+    { key: 'PD',  broad: 'ATA', label: 'Ponta Direita',      short: 'PD',  x: 84, y: 20 },
+  ]},
+  '352': { key: '352', label: '3-5-2', slots: [
+    { key: 'GOL',  broad: 'GOL', label: 'Goleiro',           short: 'GOL', x: 50, y: 92 },
+    { key: 'ZE',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 28, y: 78 },
+    { key: 'ZC',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 50, y: 82 },
+    { key: 'ZD',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 72, y: 78 },
+    { key: 'AE',   broad: 'MEI', label: 'Ala Esquerda',      short: 'AE',  x: 8,  y: 52 },
+    { key: 'VOL1', broad: 'MEI', label: 'Volante',           short: 'VOL', x: 37, y: 60 },
+    { key: 'MC',   broad: 'MEI', label: 'Meio-Campista',     short: 'MC',  x: 50, y: 46 },
+    { key: 'VOL2', broad: 'MEI', label: 'Volante',           short: 'VOL', x: 63, y: 60 },
+    { key: 'AD',   broad: 'MEI', label: 'Ala Direita',       short: 'AD',  x: 92, y: 52 },
+    { key: 'CA1',  broad: 'ATA', label: 'Centroavante',      short: 'CA',  x: 38, y: 18 },
+    { key: 'CA2',  broad: 'ATA', label: 'Centroavante',      short: 'CA',  x: 62, y: 18 },
+  ]},
+  '532': { key: '532', label: '5-3-2', slots: [
+    { key: 'GOL',  broad: 'GOL', label: 'Goleiro',           short: 'GOL', x: 50, y: 92 },
+    { key: 'LE',   broad: 'ZAG', label: 'Lateral Esquerdo',  short: 'LE',  x: 8,  y: 68 },
+    { key: 'ZE',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 30, y: 80 },
+    { key: 'ZC',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 50, y: 84 },
+    { key: 'ZD',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 70, y: 80 },
+    { key: 'LD',   broad: 'ZAG', label: 'Lateral Direito',   short: 'LD',  x: 92, y: 68 },
+    { key: 'VOL1', broad: 'MEI', label: 'Volante',           short: 'VOL', x: 30, y: 54 },
+    { key: 'MC',   broad: 'MEI', label: 'Meio-Campista',     short: 'MC',  x: 50, y: 46 },
+    { key: 'VOL2', broad: 'MEI', label: 'Volante',           short: 'VOL', x: 70, y: 54 },
+    { key: 'CA1',  broad: 'ATA', label: 'Centroavante',      short: 'CA',  x: 38, y: 18 },
+    { key: 'CA2',  broad: 'ATA', label: 'Centroavante',      short: 'CA',  x: 62, y: 18 },
+  ]},
+  '4231': { key: '4231', label: '4-2-3-1', slots: [
+    { key: 'GOL',  broad: 'GOL', label: 'Goleiro',           short: 'GOL', x: 50, y: 92 },
+    { key: 'LE',   broad: 'ZAG', label: 'Lateral Esquerdo',  short: 'LE',  x: 14, y: 74 },
+    { key: 'ZE',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 37, y: 80 },
+    { key: 'ZD',   broad: 'ZAG', label: 'Zagueiro',          short: 'ZAG', x: 63, y: 80 },
+    { key: 'LD',   broad: 'ZAG', label: 'Lateral Direito',   short: 'LD',  x: 86, y: 74 },
+    { key: 'VOL1', broad: 'MEI', label: 'Volante',           short: 'VOL', x: 36, y: 60 },
+    { key: 'VOL2', broad: 'MEI', label: 'Volante',           short: 'VOL', x: 64, y: 60 },
+    { key: 'PE',   broad: 'MEI', label: 'Ponta Esquerda',    short: 'PE',  x: 16, y: 36 },
+    { key: 'MEIA', broad: 'MEI', label: 'Meia-Atacante',     short: 'MEI', x: 50, y: 32 },
+    { key: 'PD',   broad: 'MEI', label: 'Ponta Direita',     short: 'PD',  x: 84, y: 36 },
+    { key: 'CA',   broad: 'ATA', label: 'Centroavante',      short: 'CA',  x: 50, y: 12 },
+  ]}
+};
+const POS_LABELS = { GOL: 'Goleiro', ZAG: 'Zagueiros', MEI: 'Meias', ATA: 'Atacantes' };
+
+function formationCounts(f) {
+  const c = { GOL: 0, ZAG: 0, MEI: 0, ATA: 0 };
+  f.slots.forEach(s => c[s.broad]++);
+  return c;
+}
+
+function miniPitchHTML(f) {
+  const dots = f.slots.map(s => `<div class="pm-dot" style="left:${s.x}%;top:${s.y}%" title="${s.label}"></div>`).join('');
+  return `<div class="pitch-mini"><div class="pm-line"></div><div class="pm-circle"></div>${dots}</div>`;
+}
+
+// Renders a formation's pitch: filled slots show the player's ovr + name,
+// empty slots show the position's short code. interactive+onSlotClick wires
+// up the draft screen; the pre-match hub renders the same pitch read-only.
+function renderPitch(container, formation, assignments, opts) {
+  opts = opts || {};
+  container.innerHTML = '';
+  const pitch = document.createElement('div');
+  pitch.className = 'pitch';
+  pitch.innerHTML = '<div class="p-line"></div><div class="p-circle"></div><div class="p-box-top"></div><div class="p-box-bottom"></div>';
+  formation.slots.forEach(s => {
+    const filled = assignments[s.key];
+    const wrap = document.createElement('div');
+    wrap.className = 'pitch-slot' + (filled ? ' filled' : '') + (opts.interactive ? ' clickable' : '') + (opts.activeKey === s.key ? ' active' : '');
+    wrap.style.left = s.x + '%';
+    wrap.style.top = s.y + '%';
+    wrap.innerHTML = `<div class="ps-dot">${filled ? filled.ovr : s.short}</div><div class="ps-name">${filled ? filled.name : s.label}</div>`;
+    if (opts.interactive) wrap.addEventListener('click', () => opts.onSlotClick(s, filled));
+    pitch.appendChild(wrap);
+  });
+  container.appendChild(pitch);
+}
+
+const FLAVOR_MISS = [
+  'chuta por cima do gol',
+  'para na defesa',
+  'chuta travado',
+  'cabeceia para fora',
+  'é travado no último instante',
+  'manda a bola na trave'
+];
+
+// ---------------------------------------------------------------------------
+// STATE
+// ---------------------------------------------------------------------------
+let draftPool = [];       // flattened {..., squadLabel, squadId, uid}
+let draftedIds = new Set();
+let starters = [];
+let bench = [];
+let draftPhase = 'starters'; // 'starters' | 'bench'
+let currentRoulette = null;
+let chosenFormation = null;
+let posCount = { GOL: 0, ZAG: 0, MEI: 0, ATA: 0 };
+let slotAssignments = {}; // slot.key -> drafted player, for the on-pitch diagram
+let activeSlotKey = null; // slot currently being drafted for (starters phase)
+let draftedSlotAssignments = {};
+
+let opponent = null;      // {label, flag, players: 11 on-pitch}
+let onPitch = [];         // player's current 11 (mutated by subs)
+let subsUsed = 0;
+let half = 1;
+let score = { player: 0, cpu: 0 };
+let selectedTactic = { 1: 'eq', 2: 'eq' };
+let pendingOutId = null;
+
+let tournament = null;    // group table + knockout progress, see initTournament()
+let currentStageTag = null; // 'group' | 'semi' | 'final'
+let lastShareText = '';
+let onContinue = null;
+
+function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+function buildDraftPool() {
+  draftPool = [];
+  SQUADS.forEach(sq => {
+    sq.players.forEach((p, i) => {
+      draftPool.push({ ...p, squadLabel: sq.label, squadFlag: sq.flag, uid: sq.id + '_' + i });
+    });
+  });
+}
+
+function el(id) { return document.getElementById(id); }
+
+// ---------------------------------------------------------------------------
+// FORMATION SCREEN
+// ---------------------------------------------------------------------------
+function renderFormationScreen() {
+  const grid = el('formationGrid');
+  grid.innerHTML = '';
+  Object.values(FORMATIONS).forEach(f => {
+    const c = formationCounts(f);
+    const card = document.createElement('div');
+    card.className = 'formation-card';
+    card.innerHTML = `${miniPitchHTML(f)}<div class="f-name">${f.label}</div><div class="f-breakdown">GOL ${c.GOL} · ZAG ${c.ZAG} · MEI ${c.MEI} · ATA ${c.ATA}</div>`;
+    card.addEventListener('click', () => selectFormation(f.key));
+    grid.appendChild(card);
+  });
+}
+
+function selectFormation(key) {
+  SFX.click();
+  chosenFormation = FORMATIONS[key];
+  chosenFormation.counts = formationCounts(chosenFormation);
+  posCount = { GOL: 0, ZAG: 0, MEI: 0, ATA: 0 };
+  slotAssignments = {};
+  starters = [];
+  bench = [];
+  draftedIds = new Set();
+  draftPhase = 'starters';
+  activeSlotKey = chosenFormation.slots[0].key;
+  el('screenFormation').classList.add('hidden');
+  el('screenDraft').classList.remove('hidden');
+  updateDraftProgress();
+  renderDraftPitch();
+  spinRoulette();
+}
+
+// ---------------------------------------------------------------------------
+// DRAFT SCREEN
+// ---------------------------------------------------------------------------
+function currentActiveSlot() {
+  return chosenFormation.slots.find(s => s.key === activeSlotKey) || null;
+}
+
+function nextEmptySlot() {
+  return chosenFormation.slots.find(s => !slotAssignments[s.key]) || null;
+}
+
+function updateDraftProgress() {
+  if (draftPhase === 'starters') {
+    el('draftProgress').innerHTML = `Titulares (${chosenFormation.label}): <strong>${starters.length}/11</strong>`;
+    el('posBreakdown').innerHTML = Object.keys(POS_LABELS).map(pos => {
+      const full = posCount[pos] >= chosenFormation.counts[pos];
+      return `<span class="${full ? 'full' : 'ok'}">${POS_LABELS[pos]}: ${posCount[pos]}/${chosenFormation.counts[pos]}</span>`;
+    }).join('');
+  } else {
+    el('draftProgress').innerHTML = `Reservas escolhidas: <strong>${bench.length}/5</strong>`;
+    el('posBreakdown').innerHTML = '<span>Reservas podem ser de qualquer posição</span>';
+  }
+}
+
+function updateSlotHint() {
+  const hint = el('slotHint');
+  if (draftPhase === 'starters') {
+    const slot = currentActiveSlot();
+    hint.textContent = slot ? `Escalando: ${slot.label} — clique num jogador de ${POS_LABELS[slot.broad]} para preencher essa vaga` : '';
+  } else {
+    hint.textContent = 'Fase de reservas — qualquer posição, sem vaga fixa no campo';
+  }
+}
+
+function renderDraftPitch() {
+  renderPitch(el('draftPitchWrap'), chosenFormation, slotAssignments, {
+    interactive: draftPhase === 'starters',
+    activeKey: activeSlotKey,
+    onSlotClick: (slot, filled) => {
+      SFX.click();
+      if (filled) {
+        removeFromSlot(slot.key);
+      } else {
+        activeSlotKey = slot.key;
+        renderDraftPitch();
+        spinRoulette();
+      }
+      updateDraftProgress();
+    }
+  });
+  updateSlotHint();
+}
+
+function removeFromSlot(slotKey) {
+  const player = slotAssignments[slotKey];
+  if (!player) return;
+  delete slotAssignments[slotKey];
+  starters = starters.filter(p => p.uid !== player.uid);
+  draftedIds.delete(player.uid);
+  posCount[player.pos]--;
+  draftPhase = 'starters';
+  activeSlotKey = slotKey;
+  renderDraftPitch();
+  spinRoulette();
+}
+
+function spinRoulette() {
+  SFX.click();
+  const sq = SQUADS[Math.floor(Math.random() * SQUADS.length)];
+  currentRoulette = sq;
+  el('rouletteTeam').textContent = `${sq.flag} ${sq.label}`;
+  const grid = el('playerGrid');
+  grid.innerHTML = '';
+  const activeSlot = draftPhase === 'starters' ? currentActiveSlot() : null;
+  sq.players.forEach((p, i) => {
+    const uid = sq.id + '_' + i;
+    const blocked = draftPhase === 'starters' && (!activeSlot || p.pos !== activeSlot.broad);
+    const card = document.createElement('div');
+    card.className = 'player-card' + (draftedIds.has(uid) ? ' drafted' : '') + (blocked ? ' pos-full' : '');
+    card.innerHTML = `<div class="pname">${p.name}</div><div class="pmeta"><span>${p.pos}</span><span class="povr">${p.ovr}</span></div>`;
+    if (blocked && activeSlot) card.title = `Essa vaga é de ${POS_LABELS[activeSlot.broad]} (${activeSlot.label})`;
+    if (!draftedIds.has(uid) && !blocked) {
+      card.addEventListener('click', () => draftPlayer({ ...p, squadLabel: sq.label, squadFlag: sq.flag, uid }));
+    }
+    grid.appendChild(card);
+  });
+}
+
+function draftPlayer(player) {
+  if (draftedIds.has(player.uid)) return;
+  if (draftPhase === 'starters') {
+    const slot = currentActiveSlot();
+    if (!slot || player.pos !== slot.broad) return;
+    draftedIds.add(player.uid);
+    SFX.match();
+    player.slot = slot.key;
+    player.slotLabel = slot.label;
+    player.slotShort = slot.short;
+    slotAssignments[slot.key] = player;
+    starters.push(player);
+    posCount[player.pos]++;
+    const next = nextEmptySlot();
+    if (next) {
+      activeSlotKey = next.key;
+    } else {
+      draftPhase = 'bench';
+      activeSlotKey = null;
+    }
+  } else {
+    if (bench.length >= 5) return;
+    draftedIds.add(player.uid);
+    SFX.match();
+    bench.push(player);
+  }
+
+  updateDraftProgress();
+  renderDraftPitch();
+
+  if (draftPhase === 'bench' && bench.length === 5) {
+    finishDraft();
+  } else {
+    spinRoulette(); // each pick consumes the spin — roll again for the next player, now reflecting the current phase/slot
+  }
+}
+
+let draftedStarters = [];
+let draftedBench = [];
+
+function finishDraft() {
+  SFX.win();
+  draftedStarters = [...starters];
+  draftedBench = [...bench];
+  draftedSlotAssignments = { ...slotAssignments };
+  el('screenDraft').classList.add('hidden');
+  renderPitch(el('preMatchPitch'), chosenFormation, draftedSlotAssignments, { interactive: false });
+  const list = el('finalSquadList');
+  list.innerHTML = '';
+  bench.forEach(p => list.appendChild(chip(p, true)));
+  initTournament();
+}
+
+function chip(p, isBench) {
+  const d = document.createElement('div');
+  d.className = 'p-chip' + (isBench ? ' bench' : '');
+  const posText = p.slotLabel || POS_LABELS[p.pos] || p.pos;
+  d.innerHTML = `<div>${p.name}</div><div class="p-pos">${posText} · ${p.ovr} · ${p.squadFlag}</div>`;
+  return d;
+}
+
+// ---------------------------------------------------------------------------
+// MATCH SETUP
+// ---------------------------------------------------------------------------
+function avgOvr(list) {
+  return Math.round(list.reduce((s, p) => s + p.ovr, 0) / list.length);
+}
+
+// ---------------------------------------------------------------------------
+// TOURNAMENT — group stage (player + 3 draws, round robin) then a two-leg
+// knockout (semifinal, final) with penalty shootouts on draws.
+// ---------------------------------------------------------------------------
+function pickDistinctSquads(n, excludeIds) {
+  excludeIds = excludeIds || [];
+  const pool = SQUADS.filter(sq => !excludeIds.includes(sq.id));
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
+
+function teamRow(sq) {
+  return { ref: sq, label: sq.label, flag: sq.flag, ovr: avgOvr(sq.players.slice(0, 11)), pts: 0, w: 0, d: 0, l: 0, gf: 0, gc: 0, played: 0 };
+}
+
+function recordResult(rowA, rowB, golsA, golsB) {
+  rowA.played++; rowB.played++;
+  rowA.gf += golsA; rowA.gc += golsB;
+  rowB.gf += golsB; rowB.gc += golsA;
+  if (golsA > golsB) { rowA.w++; rowA.pts += 3; rowB.l++; }
+  else if (golsA < golsB) { rowB.w++; rowB.pts += 3; rowA.l++; }
+  else { rowA.d++; rowB.d++; rowA.pts++; rowB.pts++; }
+}
+
+// Fast, non-interactive result for CPU-vs-CPU group fixtures (player never
+// sees these — only the final score matters for the table).
+function quickMatchResult(ovrA, ovrB) {
+  const chanceA = clamp(0.018 + (ovrA - ovrB) / 1400, 0.006, 0.05);
+  const chanceB = clamp(0.018 + (ovrB - ovrA) / 1400, 0.006, 0.05);
+  let a = 0, b = 0;
+  for (let m = 1; m <= 90; m++) {
+    if (Math.random() < chanceA) a++;
+    if (Math.random() < chanceB) b++;
+  }
+  return [a, b];
+}
+
+function simulateCpuFixture(keyA, keyB) {
+  const rowA = tournament.table[keyA], rowB = tournament.table[keyB];
+  const [ga, gb] = quickMatchResult(rowA.ovr, rowB.ovr);
+  recordResult(rowA, rowB, ga, gb);
+}
+
+function sortedTable() {
+  const rows = ['player', 'g0', 'g1', 'g2'].map(k => tournament.table[k]);
+  return rows.sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf);
+}
+
+function renderGroupTable() {
+  const rows = sortedTable();
+  const body = rows.map(r => `<tr class="${r === tournament.table.player ? 'you' : ''}">
+      <td>${r.flag ? r.flag + ' ' : ''}${r.label}</td>
+      <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+      <td>${r.gf - r.gc}</td><td>${r.pts}</td>
+    </tr>`).join('');
+  return `<table class="group-table"><thead><tr><th>Time</th><th>P</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>Pts</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function initTournament() {
+  const group = pickDistinctSquads(3);
+  tournament = {
+    stage: 'group',
+    group,
+    usedIds: group.map(g => g.id),
+    table: {
+      player: { ref: null, label: 'Seu Time', flag: '', ovr: avgOvr(draftedStarters), pts: 0, w: 0, d: 0, l: 0, gf: 0, gc: 0, played: 0 },
+      g0: teamRow(group[0]), g1: teamRow(group[1]), g2: teamRow(group[2])
+    },
+    fixtureIndex: 0,
+    knockoutOpponent: null,
+    result: null
+  };
+  simulateCpuFixture('g0', 'g1');
+  simulateCpuFixture('g0', 'g2');
+  simulateCpuFixture('g1', 'g2');
+  showHub();
+}
+
+function resolveGroupStage() {
+  const rows = sortedTable();
+  const advanced = rows.slice(0, 2).includes(tournament.table.player);
+  if (advanced) {
+    tournament.stage = 'semi';
+    tournament.knockoutOpponent = pickDistinctSquads(1, tournament.usedIds)[0];
+    tournament.usedIds.push(tournament.knockoutOpponent.id);
+  } else {
+    tournament.stage = 'done';
+    tournament.result = 'eliminated-group';
+  }
+}
+
+function showHub() {
+  el('screenMatch').classList.add('hidden');
+  el('screenDraft').classList.add('hidden');
+  el('screenFormation').classList.add('hidden');
+  el('screenPreMatch').classList.remove('hidden');
+  el('hubTableWrap').innerHTML = renderGroupTable();
+
+  if (tournament.stage === 'group') {
+    const opp = tournament.group[tournament.fixtureIndex];
+    el('hubTitle').textContent = `Fase de Grupos — Jogo ${tournament.fixtureIndex + 1} de 3`;
+    el('hubActionBtn').innerHTML = iconSVG('search') + `Enfrentar ${opp.flag} ${opp.label}`;
+    el('hubActionBtn').onclick = () => startMatch(opp, 'group');
+  } else if (tournament.stage === 'semi') {
+    const opp = tournament.knockoutOpponent;
+    el('hubTitle').textContent = 'Você avançou para o mata-mata! Semifinal:';
+    el('hubActionBtn').innerHTML = iconSVG('shield') + `Semifinal vs ${opp.flag} ${opp.label}`;
+    el('hubActionBtn').onclick = () => startMatch(opp, 'semi');
+  } else if (tournament.stage === 'final') {
+    const opp = tournament.knockoutOpponent;
+    el('hubTitle').textContent = 'FINAL — dispute o título mundial!';
+    el('hubActionBtn').innerHTML = iconSVG('trophy') + `Final vs ${opp.flag} ${opp.label}`;
+    el('hubActionBtn').onclick = () => startMatch(opp, 'final');
+  } else {
+    const messages = {
+      champion: 'CAMPEÃO DO MUNDO!',
+      'eliminated-group': 'Eliminado na fase de grupos.',
+      'eliminated-semi': 'Eliminado na semifinal.',
+      'eliminated-final': 'Vice-campeão — perdeu a final.'
+    };
+    el('hubTitle').innerHTML = (tournament.result === 'champion' ? iconSVG('trophy') : iconSVG('frown')) + messages[tournament.result];
+    el('hubActionBtn').innerHTML = iconSVG('refresh') + 'Novo Torneio (mesmo time)';
+    el('hubActionBtn').onclick = () => initTournament();
+  }
+}
+
+function startMatch(oppSquad, stageTag) {
+  currentStageTag = stageTag;
+  opponent = { label: oppSquad.label, flag: oppSquad.flag, players: oppSquad.players.slice(0, 11) };
+  onPitch = [...draftedStarters];
+  bench = [...draftedBench];
+  subsUsed = 0;
+  pendingOutId = null;
+  half = 1;
+  score = { player: 0, cpu: 0 };
+  selectedTactic = { 1: 'eq', 2: 'eq' };
+
+  el('screenPreMatch').classList.add('hidden');
+  el('screenMatch').classList.remove('hidden');
+  el('eventLog').innerHTML = '';
+  el('subArea').classList.add('hidden');
+  el('matchControls').classList.add('hidden');
+  el('tacticArea').classList.remove('hidden');
+  el('tacticLabel').textContent = 'Escolha a postura do 1º tempo';
+  el('playHalfBtn').innerHTML = iconSVG('play') + 'Jogar 1º Tempo';
+  setTacticButtons('eq');
+  renderVsRow();
+  renderScore();
+}
+
+async function runPenaltyShootout() {
+  const playerOvr = avgOvr(onPitch);
+  const cpuOvr = avgOvr(opponent.players);
+  const playerChance = clamp(0.72 + (playerOvr - cpuOvr) / 500, 0.55, 0.9);
+  const cpuChance = clamp(0.72 + (cpuOvr - playerOvr) / 500, 0.55, 0.9);
+  let playerScore = 0, cpuScore = 0;
+  let round = 0;
+  while (round < 5 || playerScore === cpuScore) {
+    round++;
+    await sleep(300);
+    const pScored = Math.random() < playerChance;
+    if (pScored) playerScore++;
+    logEvent(`Pênalti ${round} — Você: ${pScored ? 'GOL' : 'perdeu'} (${playerScore} x ${cpuScore})`, pScored ? 'goal-player' : 'flavor');
+
+    await sleep(300);
+    const cScored = Math.random() < cpuChance;
+    if (cScored) cpuScore++;
+    logEvent(`Pênalti ${round} — ${opponent.label}: ${cScored ? 'GOL' : 'perdeu'} (${playerScore} x ${cpuScore})`, cScored ? 'goal-cpu' : 'flavor');
+
+    if (round >= 12) break;
+  }
+  return { playerScore, cpuScore };
+}
+
+function renderVsRow() {
+  el('vsRow').innerHTML = `
+    <div class="side">
+      <div class="team-name">SEU TIME</div>
+      <div class="team-ovr">${avgOvr(onPitch)}</div>
+    </div>
+    <div class="vs-x">✕</div>
+    <div class="side">
+      <div class="team-name">${opponent.flag} ${opponent.label.toUpperCase()}</div>
+      <div class="team-ovr">${avgOvr(opponent.players)}</div>
+    </div>`;
+}
+
+function renderScore() {
+  el('scoreBig').textContent = `${score.player} x ${score.cpu}`;
+}
+
+function setTacticButtons(active) {
+  document.querySelectorAll('#tacticRow button').forEach(b => {
+    b.classList.toggle('active', b.dataset.tactic === active);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// SIMULATION
+// ---------------------------------------------------------------------------
+function logEvent(text, cls, iconName) {
+  const div = document.createElement('div');
+  div.className = 'ev ' + cls;
+  div.innerHTML = iconName ? iconSVG(iconName) + text : text;
+  el('eventLog').appendChild(div);
+  el('eventLog').scrollTop = el('eventLog').scrollHeight;
+}
+
+function pickScorer(team) {
+  const weight = p => (p.pos === 'GOL' ? 0 : p.pos === 'ATA' ? 3 : p.pos === 'MEI' ? 2 : 1) * p.ovr;
+  const total = team.reduce((s, p) => s + weight(p), 0);
+  let roll = Math.random() * total;
+  for (const p of team) {
+    roll -= weight(p);
+    if (roll <= 0) return p;
+  }
+  return team[team.length - 1];
+}
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+async function playHalf() {
+  const tacticKey = selectedTactic[half];
+  const t = TACTICS[tacticKey];
+  const cpuTacticKey = ['of', 'eq', 'def'][Math.floor(Math.random() * 3)];
+  const ct = TACTICS[cpuTacticKey];
+
+  const playerAtk = avgOvr(onPitch) + t.atk;
+  const playerDef = avgOvr(onPitch) + t.def;
+  const cpuAtk = avgOvr(opponent.players) + ct.atk;
+  const cpuDef = avgOvr(opponent.players) + ct.def;
+
+  // Independent per-minute chance for each side (instead of a handful of
+  // scripted "big moments") — gives real variance across matches instead of
+  // funneling almost everything into narrow 1x0/1x1 CPU-favored scores.
+  const chancePlayerGoal = clamp(0.018 + (playerAtk - cpuDef) / 1400, 0.006, 0.05);
+  const chanceCpuGoal = clamp(0.018 + (cpuAtk - playerDef) / 1400, 0.006, 0.05);
+
+  const minuteBase = half === 1 ? 0 : 45;
+
+  logEvent(`— INÍCIO DO ${half}º TEMPO —`, 'flavor');
+  SFX.click();
+  el('liveBadge').classList.remove('hidden');
+  await sleep(400);
+
+  for (let m = 1; m <= 45; m++) {
+    const minute = minuteBase + m;
+    await sleep(55 + Math.random() * 35);
+
+    if (Math.random() < chancePlayerGoal) {
+      const scorer = pickScorer(onPitch);
+      score.player++;
+      logEvent(`${minute}' GOL do seu time! ${scorer.name} balança as redes!`, 'goal-player', 'starWin');
+      SFX.match();
+      renderScore();
+    } else if (Math.random() < chanceCpuGoal) {
+      const scorer = pickScorer(opponent.players);
+      score.cpu++;
+      logEvent(`${minute}' Gol de ${opponent.label}! ${scorer.name} marca.`, 'goal-cpu', 'burstLose');
+      renderScore();
+    } else if (Math.random() < 0.045) {
+      const forPlayer = Math.random() < 0.5;
+      const p = pickScorer(forPlayer ? onPitch : opponent.players);
+      logEvent(`${minute}' ${p.name}${forPlayer ? '' : ' (' + opponent.label + ')'} ${FLAVOR_MISS[Math.floor(Math.random() * FLAVOR_MISS.length)]}.`, 'flavor');
+    }
+  }
+
+  await sleep(300);
+  el('liveBadge').classList.add('hidden');
+
+  if (half === 1) {
+    logEvent('— FIM DO 1º TEMPO —', 'flavor');
+    goToHalftime();
+  } else {
+    logEvent('— FIM DE JOGO —', 'flavor');
+    await finishMatch();
+  }
+}
+
+function goToHalftime() {
+  half = 2;
+  el('tacticLabel').textContent = 'Escolha a postura do 2º tempo (e faça substituições)';
+  el('playHalfBtn').innerHTML = iconSVG('play') + 'Jogar 2º Tempo';
+  setTacticButtons(selectedTactic[2]);
+  el('subArea').classList.remove('hidden');
+  renderSubPanel();
+}
+
+function renderSubPanel() {
+  el('subProgress').textContent = `Substituições: ${subsUsed}/5`;
+  const startersList = el('subStartersList');
+  const benchList = el('subBenchList');
+  startersList.innerHTML = '';
+  benchList.innerHTML = '';
+
+  onPitch.forEach(p => {
+    const c = chip(p, false);
+    c.classList.toggle('selected', pendingOutId === p.uid);
+    c.addEventListener('click', () => {
+      if (subsUsed >= 5) return;
+      pendingOutId = pendingOutId === p.uid ? null : p.uid;
+      renderSubPanel();
+    });
+    startersList.appendChild(c);
+  });
+
+  bench.forEach(p => {
+    const c = chip(p, true);
+    c.addEventListener('click', () => {
+      if (!pendingOutId || subsUsed >= 5) return;
+      const outIdx = onPitch.findIndex(x => x.uid === pendingOutId);
+      if (outIdx === -1) return;
+      const benchIdx = bench.findIndex(x => x.uid === p.uid);
+      const outPlayer = onPitch[outIdx];
+      // carry the outgoing starter's pitch slot to the sub for display continuity
+      p.slot = outPlayer.slot; p.slotLabel = outPlayer.slotLabel; p.slotShort = outPlayer.slotShort;
+      outPlayer.slot = undefined; outPlayer.slotLabel = undefined; outPlayer.slotShort = undefined;
+      onPitch[outIdx] = p;
+      bench[benchIdx] = outPlayer;
+      subsUsed++;
+      pendingOutId = null;
+      SFX.move();
+      renderVsRow();
+      renderSubPanel();
+    });
+    benchList.appendChild(c);
+  });
+}
+
+async function finishMatch() {
+  el('tacticArea').classList.add('hidden');
+  el('subArea').classList.add('hidden');
+
+  const isKnockout = currentStageTag === 'semi' || currentStageTag === 'final';
+  let penalties = null;
+
+  if (isKnockout && score.player === score.cpu) {
+    logEvent('Empate após os 90 minutos — vai para os pênaltis!', 'flavor', 'equalsDraw');
+    await sleep(400);
+    penalties = await runPenaltyShootout();
+  }
+
+  if (currentStageTag === 'group') {
+    recordResult(tournament.table.player, tournament.table['g' + tournament.fixtureIndex], score.player, score.cpu);
+    if (score.player > score.cpu) {
+      SFX.win();
+      logEvent(`VITÓRIA! Você venceu ${opponent.label} por ${score.player} x ${score.cpu}!`, 'goal-player', 'trophy');
+      lastShareText = `Venci ${opponent.label} por ${score.player} x ${score.cpu} na fase de grupos do Fantasy World Cup do PlayHub!`;
+    } else if (score.player < score.cpu) {
+      SFX.gameover();
+      logEvent(`Derrota. ${opponent.label} venceu por ${score.cpu} x ${score.player}.`, 'goal-cpu', 'frown');
+      lastShareText = `Perdi de ${opponent.label} por ${score.cpu} x ${score.player} na fase de grupos do Fantasy World Cup do PlayHub!`;
+    } else {
+      logEvent(`Empate em ${score.player} x ${score.cpu}.`, 'flavor', 'equalsDraw');
+      lastShareText = `Empatei em ${score.player} x ${score.cpu} com ${opponent.label} na fase de grupos do Fantasy World Cup do PlayHub!`;
+    }
+    tournament.fixtureIndex++;
+    if (tournament.fixtureIndex >= 3) resolveGroupStage();
+  } else {
+    const playerWon = penalties ? penalties.playerScore > penalties.cpuScore : score.player > score.cpu;
+    if (playerWon) {
+      SFX.win();
+      logEvent(penalties
+        ? `Você venceu nos pênaltis por ${penalties.playerScore} x ${penalties.cpuScore}!`
+        : `VITÓRIA! Você venceu ${opponent.label} por ${score.player} x ${score.cpu}!`, 'goal-player', 'trophy');
+      lastShareText = `Venci ${opponent.label} na ${currentStageTag === 'semi' ? 'semifinal' : 'final'} do Fantasy World Cup do PlayHub!`;
+      if (currentStageTag === 'semi') {
+        tournament.stage = 'final';
+        tournament.knockoutOpponent = pickDistinctSquads(1, tournament.usedIds)[0];
+        tournament.usedIds.push(tournament.knockoutOpponent.id);
+      } else {
+        tournament.stage = 'done';
+        tournament.result = 'champion';
+      }
+    } else {
+      SFX.gameover();
+      logEvent(penalties
+        ? `Você perdeu nos pênaltis por ${penalties.cpuScore} x ${penalties.playerScore}.`
+        : `Derrota. ${opponent.label} venceu por ${score.cpu} x ${score.player}.`, 'goal-cpu', 'frown');
+      lastShareText = `Perdi para ${opponent.label} na ${currentStageTag === 'semi' ? 'semifinal' : 'final'} do Fantasy World Cup do PlayHub.`;
+      tournament.stage = 'done';
+      tournament.result = currentStageTag === 'semi' ? 'eliminated-semi' : 'eliminated-final';
+    }
+  }
+
+  el('matchControls').classList.remove('hidden');
+  onContinue = showHub;
+}
+
+// ---------------------------------------------------------------------------
+// EVENTS
+// ---------------------------------------------------------------------------
+el('spinBtn').addEventListener('click', spinRoulette);
+
+document.querySelectorAll('#tacticRow button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    SFX.click();
+    selectedTactic[half] = btn.dataset.tactic;
+    setTacticButtons(btn.dataset.tactic);
+  });
+});
+
+el('playHalfBtn').addEventListener('click', async () => {
+  el('playHalfBtn').disabled = true;
+  el('tacticRow').querySelectorAll('button').forEach(b => b.disabled = true);
+  el('subArea').classList.add('hidden');
+  await playHalf();
+  el('playHalfBtn').disabled = false;
+  el('tacticRow').querySelectorAll('button').forEach(b => b.disabled = false);
+});
+
+el('continueBtn').addEventListener('click', () => { if (onContinue) onContinue(); });
+
+el('newSquadBtn').addEventListener('click', () => {
+  starters = []; bench = []; draftedIds = new Set(); draftPhase = 'starters'; chosenFormation = null;
+  slotAssignments = {}; activeSlotKey = null; draftedSlotAssignments = {};
+  tournament = null; currentStageTag = null;
+  el('screenMatch').classList.add('hidden');
+  el('screenPreMatch').classList.add('hidden');
+  el('screenFormation').classList.remove('hidden');
+  el('playerGrid').innerHTML = '';
+  el('rouletteTeam').textContent = '';
+  renderFormationScreen();
+});
+
+el('shareBtn').addEventListener('click', () => {
+  SHARE.score(lastShareText || 'Jogando Fantasy World Cup no PlayHub!');
+});
+
+// ---------------------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------------------
+buildDraftPool();
+renderFormationScreen();
+</script>
+</body>
+</html>
