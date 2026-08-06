@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcade Central - Jogos Online</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid #334155;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .game-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      border: 1px solid #334155;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+
+    .game-card h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    .game-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Modal do Jogo */
+    .game-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      position: relative;
+      max-width: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: var(--text);
+    }
+
+    /* Estilos específicos dos Jogos */
+    canvas {
+      background-color: #000;
+      border: 2px solid #334155;
+      margin-top: 1rem;
+    }
+
+    /* Jogo da Velha */
+    .tic-tac-toe {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      grid-template-rows: repeat(3, 80px);
+      gap: 5px;
+      margin-top: 1rem;
+    }
+
+    .cell {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cell:hover {
+      background-color: #1e293b;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: var(--card-bg);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🕹️ Arcade Central</h1>
+  </header>
+
+  <div class="container">
+    <div class="game-grid">
+      <!-- Card 1 -->
+      <div class="game-card">
+        <h3>Jogo da Cobrinha</h3>
+        <p>Coma os pontos vermelhos e não bata nas paredes!</p>
+        <button class="btn" onclick="openGame('snake')">Jogar Agora</button>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="game-card">
+        <h3>Jogo da Velha</h3>
+        <p>Desafie a inteligência da máquina neste clássico.</p>
+        <button class="btn" onclick="openGame('tictactoe')">Jogar Agora</button>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="game-card">
+        <h3>Desvio de Asteroides</h3>
+        <p>Pilote a nave e evite os asteroides caindo do espaço.</p>
+        <button class="btn" onclick="openGame('asteroids')">Jogar Agora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do Jogo -->
+  <div class="game-modal" id="gameModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeGame()">&times;</span>
+      <h2 id="modalTitle">Nome do Jogo</h2>
+      <div id="gameContainer"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Arcade Central. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    let currentGameLoop = null;
+
+    function openGame(gameType) {
+      const modal = document.getElementById('gameModal');
+      const container = document.getElementById('gameContainer');
+      const title = document.getElementById('modalTitle');
+      
+      container.innerHTML = '';
+      modal.style.display = 'flex';
+
+      if (gameType === 'snake') {
+        title.innerText = 'Jogo da Cobrinha';
+        startSnake(container);
+      } else if (gameType === 'tictactoe') {
+        title.innerText = 'Jogo da Velha';
+        startTicTacToe(container);
+      } else if (gameType === 'asteroids') {
+        title.innerText = 'Desvio de Asteroides';
+        startAsteroids(container);
+      }
+    }
+
+    function closeGame() {
+      const modal = document.getElementById('gameModal');
+      modal.style.display = 'none';
+      if (currentGameLoop) clearInterval(currentGameLoop);
+      document.onkeydown = null;
+    }
+
+    /* --- JOGO 1: SNAKE --- */
+    function startSnake(container) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 300;
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      const grid = 15;
+      let snake = [{x: 150, y: 150}];
+      let food = {x: 60, y: 60};
+      let dx = grid, dy = 0;
+
+      document.onkeydown = (e) => {
+        if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -grid; }
+        if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = grid; }
+        if (e.key === 'ArrowLeft' && dx === 0) { dx = -grid; dy = 0; }
+        if (e.key === 'ArrowRight' && dx === 0) { dx = grid; dy = 0; }
+      };
+
+      currentGameLoop = setInterval(() => {
+        const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+        // Colisão com parede
+        if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+          alert('Game Over!');
+          closeGame();
+          return;
+        }
+
+        snake.unshift(head);
+
+        // Comer comida
+        if (head.x === food.x && head.y === food.y) {
+          food = {
+            x: Math.floor(Math.random() * (canvas.width / grid)) * grid,
+            y: Math.floor(Math.random() * (canvas.height / grid)) * grid
+          };
+        } else {
+          snake.pop();
+        }
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(food.x, food.y, grid - 1, grid - 1);
+
+        ctx.fillStyle = '#22c55e';
+        snake.forEach(part => ctx.fillRect(part.x, part.y, grid - 1, grid - 1));
+      }, 100);
+    }
+
+    /* --- JOGO 2: JOGO DA VELHA --- */
+    function startTicTacToe(container) {
+      const board = document.createElement('div');
+      board.className = 'tic-tac-toe';
+      let state = ['', '', '', '', '', '', '', '', ''];
+
+      function checkWin(s, p) {
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        return wins.some(w => w.every(i => s[i] === p));
+      }
+
+      function botMove() {
+        let empty = state.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+        if (empty.length > 0) {
+          let move = empty[Math.floor(Math.random() * empty.length)];
+          state[move] = 'O';
+          render();
+          if (checkWin(state, 'O')) setTimeout(() => alert('A máquina venceu!'), 100);
+        }
+      }
+
+      function render() {
+        board.innerHTML = '';
+        state.forEach((val, i) => {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.innerText = val;
+          cell.onclick = () => {
+            if (state[i] === '' && !checkWin(state, 'O')) {
+              state[i] = 'X';
+              render();
+              if (checkWin(state, 'X')) {
+                setTimeout(() => alert('Você venceu!'), 100);
+              } else {
+                setTimeout(botMove, 200);
+              }
+            }
+          };
+          board.appendChild(cell);
+        });
+      }
+
+      container.appendChild(board);
+      render();
+    }
+
+    /* --- JOGO 3: DESVIO DE ASTEROIDES --- */
+    function startAsteroids(container) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 300;
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      let player = { x: 135, y: 260, width: 30, height: 20 };
+      let enemies = [];
+      let score = 0;
+
+      document.onkeydown = (e) => {
+        if (e.key === 'ArrowLeft' && player.x > 0) player.x -= 15;
+        if (e.key === 'ArrowRight' && player.x < canvas.width - player.width) player.x += 15;
+      };
+
+      currentGameLoop = setInterval(() => {
+        if (Math.random() < 0.1) {
+          enemies.push({ x: Math.random() * (canvas.width - 20), y: 0, size: 20 });
+        }
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Player
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+
+        // Inimigos
+        ctx.fillStyle = '#eab308';
+        for (let i = 0; i < enemies.length; i++) {
+          enemies[i].y += 4;
+          ctx.fillRect(enemies[i].x, enemies[i].y, enemies[i].size, enemies[i].size);
+
+          // Colisão
+          if (
+            player.x < enemies[i].x + enemies[i].size &&
+            player.x + player.width > enemies[i].x &&
+            player.y < enemies[i].y + enemies[i].size &&
+            player.y + player.height > enemies[i].y
+          ) {
+            alert(`Game Over! Pontuação: ${score}`);
+            closeGame();
+            return;
+          }
+        }
+
+        enemies = enemies.filter(e => e.y < canvas.height);
+        score++;
+      }, 50);
+    }
+  </script>
+</body>
+</html>
