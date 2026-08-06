@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Brasília | Salão de Beleza e Estética</title>
+    <meta name="description" content="Elegância, cuidado e exclusividade no coração de Brasília. Agende seu horário no melhor salão da Asa Sul.">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#F9F9F6',
+                            dark: '#2C2C2C',
+                            gold: '#C5A059',
+                            goldHover: '#b08d47',
+                            light: '#FFFFFF',
+                            muted: '#71717a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-brand-bg text-brand-dark font-sans antialiased selection:bg-brand-gold selection:text-white">
+
+    <!-- BARRA DE ACESSIBILIDADE E TOPO -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-brand-bg/90 backdrop-blur-md border-b border-zinc-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold tracking-wider uppercase text-brand-dark flex items-center gap-2">
+                <span class="text-brand-gold font-light">Aura</span> Brasília
+            </a>
+
+            <!-- Navegação Desktop -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                <a href="#sobre" class="hover:text-brand-gold transition-colors">O Conceito</a>
+                <a href="#servicos" class="hover:text-brand-gold transition-colors">Serviços</a>
+                <a href="#promocao" class="hover:text-brand-gold transition-colors text-brand-gold font-semibold">Boas-Vindas</a>
+                <a href="#galeria" class="hover:text-brand-gold transition-colors">Galeria</a>
+                <a href="#contato" class="hover:text-brand-gold transition-colors">Localização</a>
+            </nav>
+
+            <!-- Ações Diretas -->
+            <div class="flex items-center space-x-4">
+                <a href="#agendamento" class="hidden sm:inline-flex bg-brand-gold hover:bg-brand-goldHover text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm">
+                    Agendar Horário
+                </a>
+                <!-- Menu Mobile Button -->
+                <button id="menu-btn" aria-label="Abrir Menu" class="md:hidden text-brand-dark focus:outline-none">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brand-bg border-b border-zinc-200 px-4 pt-2 pb-6 space-y-3">
+            <a href="#sobre" class="block text-base font-medium py-1 hover:text-brand-gold">O Conceito</a>
+            <a href="#servicos" class="block text-base font-medium py-1 hover:text-brand-gold">Serviços</a>
+            <a href="#promocao" class="block text-base font-medium py-1 text-brand-gold">Boas-Vindas</a>
+            <a href="#galeria" class="block text-base font-medium py-1 hover:text-brand-gold">Galeria</a>
+            <a href="#contato" class="block text-base font-medium py-1 hover:text-brand-gold">Localização</a>
+            <a href="#agendamento" class="block text-center w-full bg-brand-gold text-white py-3 rounded-full font-medium mt-2">Agendar Horário</a>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+
+        <!-- SEÇÃO HERO -->
+        <section class="relative pt-32 pb-20 md:pt-44 md:pb-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <span class="inline-block bg-brand-gold/10 text-brand-gold text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                            Salão de Alto Padrão • Asa Sul, Brasília
+                        </span>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+                            A essência da sua beleza no coração de Brasília.
+                        </h1>
+                        <p class="text-lg text-brand-muted max-w-lg">
+                            Elegância, cuidado e exclusividade em um só lugar. Descubra uma nova experiência em tratamentos capilares e estética avançada.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                            <a href="#agendamento" class="bg-brand-dark hover:bg-zinc-800 text-white px-8 py-3.5 rounded-full text-center font-medium transition-all shadow-md">
+                                Agendar Agora
+                            </a>
+                            <a href="#servicos" class="border border-brand-dark/20 hover:border-brand-gold text-brand-dark px-8 py-3.5 rounded-full text-center font-medium transition-all">
+                                Nossos Serviços
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-zinc-200">
+                            <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=800" alt="Interior sofisticado do salão Aura Brasília" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl hidden sm:block max-w-xs border border-zinc-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold font-bold">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold">Excelência Garantida</p>
+                                    <p class="text-xs text-brand-muted">Avaliação 4.9/5 por nossas clientes em Brasília.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO BOAS-VINDAS (NOVOS CLIENTES) -->
+        <section id="promocao" class="py-12 bg-brand-gold/10 border-y border-brand-gold/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+                <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">Exclusivo para Novos Clientes</span>
+                <h2 class="text-2xl sm:text-3xl font-bold">Ganhe 20% de Desconto na sua Primeira Visita</h2>
+                <p class="text-brand-muted max-w-2xl mx-auto text-sm sm:text-base">
+                    Experimente nossos serviços de corte, coloração ou tratamentos especiais com uma condição exclusiva de boas-vindas.
+                </p>
+                <div class="pt-2">
+                    <a href="#agendamento" class="inline-block bg-brand-gold hover:bg-brand-goldHover text-white px-8 py-3 rounded-full text-sm font-semibold transition-all shadow-md">
+                        Resgatar Meu Cupom de 20%
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO SOBRE O CONCEITO -->
+        <section id="sobre" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="aspect-square rounded-3xl overflow-hidden shadow-lg bg-zinc-200">
+                        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800" alt="Profissional cuidando de cliente" class="w-full h-full object-cover">
+                    </div>
+                    <div class="space-y-6">
+                        <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">O Conceito Aura</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Um refúgio de bem-estar e sofisticação na capital.</h2>
+                        <p class="text-brand-muted leading-relaxed">
+                            Fundado com o propósito de elevar a autoestima através de um atendimento altamente personalizado, o **Aura Brasília** combina tendências globais de visagismo com o conforto que você merece. Cada detalhe foi pensado para proporcionar uma pausa revigorante na sua rotina.
+                        </p>
+                        <div class="grid grid-cols-2 gap-6 pt-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-brand-gold">+10 anos</h3>
+                                <p class="text-sm text-brand-muted mt-1">De excelência e paixão pela beleza.</p>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-brand-gold">100%</h3>
+                                <p class="text-sm text-brand-muted mt-1">Produtos premium e sustentáveis.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO SERVIÇOS -->
+        <section id="servicos" class="py-24 bg-white border-y border-zinc-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto space-y-4 mb-16">
+                    <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">Nossos Serviços</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold">Cuidados completos para realçar sua identidade</h2>
+                    <p class="text-brand-muted">Escolha entre nossos procedimentos de alto padrão executados por especialistas.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Cabelo -->
+                    <div class="bg-brand-bg p-8 rounded-3xl border border-zinc-100 hover:border-brand-gold/40 transition-all flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-brand-gold/10 flex items-center justify-center text-brand-gold text-xl">
+                                <i class="fa-solid fa-scissors"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Cabelo & Visagismo</h3>
+                            <p class="text-sm text-brand-muted">Cortes personalizados, coloração avançada, mechas, balayage e tratamentos de alta performance (Hydra/Reconstrução).</p>
+                        </div>
+                        <div class="pt-6 border-t border-zinc-200 mt-6 flex items-center justify-between">
+                            <span class="text-xs font-semibold text-brand-gold uppercase">A partir de R$ 120</span>
+                            <a href="#agendamento" class="text-sm font-bold hover:text-brand-gold transition-colors">Agendar <i class="fa-solid fa-arrow-right text-xs ml-1"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Estética -->
+                    <div class="bg-brand-bg p-8 rounded-3xl border border-zinc-100 hover:border-brand-gold/40 transition-all flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-brand-gold/10 flex items-center justify-center text-brand-gold text-xl">
+                                <i class="fa-solid fa-spa"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Estética Facial & Corporal</h3>
+                            <p class="text-sm text-brand-muted">Limpeza de pele profunda, design de sobrancelhas, micropigmentação e massagens relaxantes para renovar suas energias.</p>
+                        </div>
+                        <div class="pt-6 border-t border-zinc-200 mt-6 flex items-center justify-between">
+                            <span class="text-xs font-semibold text-brand-gold uppercase">A partir de R$ 90</span>
+                            <a href="#agendamento" class="text-sm font-bold hover:text-brand-gold transition-colors">Agendar <i class="fa-solid fa-arrow-right text-xs ml-1"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Noivas -->
+                    <div class="bg-brand-bg p-8 rounded-3xl border border-zinc-100 hover:border-brand-gold/40 transition-all flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-brand-gold/10 flex items-center justify-center text-brand-gold text-xl">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Dia de Noiva & Eventos</h3>
+                            <p class="text-sm text-brand-muted">Produção completa e exclusiva para o seu grande dia, com assessoria dedicada e pacotes personalizados para madrinhas.</p>
+                        </div>
+                        <div class="pt-6 border-t border-zinc-200 mt-6 flex items-center justify-between">
+                            <span class="text-xs font-semibold text-brand-gold uppercase">Sob Consulta</span>
+                            <a href="#agendamento" class="text-sm font-bold hover:text-brand-gold transition-colors">Consultar <i class="fa-solid fa-arrow-right text-xs ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO GALERIA (CORRIGIDA) -->
+        <section id="galeria" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto space-y-4 mb-16">
+                    <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">Portfólio</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold">Inspire-se com Nossas Transformações</h2>
+                    <p class="text-brand-muted">Acompanhe alguns dos trabalhos realizados por nossa equipe em Brasília.</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="aspect-square rounded-2xl overflow-hidden shadow-md bg-zinc-200 group">
+                        <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&q=80&w=500" alt="Trabalho de cabelo 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="aspect-square rounded-2xl overflow-hidden shadow-md bg-zinc-200 group">
+                        <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&q=80&w=500" alt="Trabalho de cabelo 2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="aspect-square rounded-2xl overflow-hidden shadow-md bg-zinc-200 group">
+                        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&q=80&w=500" alt="Trabalho de cabelo 3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="aspect-square rounded-2xl overflow-hidden shadow-md bg-zinc-200 group">
+                        <img src="https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&q=80&w=500" alt="Trabalho de cabelo 4" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO AGENDAMENTO -->
+        <section id="agendamento" class="py-24 bg-brand-dark text-white relative overflow-hidden">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center space-y-4 mb-12">
+                    <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">Agendamento Online</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold">Reserve seu momento Aura</h2>
+                    <p class="text-zinc-400">Preencha o formulário abaixo ou entre em contato diretamente pelo WhatsApp.</p>
+                </div>
+
+                <div class="bg-white/5 border border-white/10 p-8 sm:p-12 rounded-3xl backdrop-blur-md">
+                    <form onsubmit="handleFormSubmit(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nome" class="block text-sm font-medium text-zinc-300 mb-2">Nome Completo</label>
+                                <input type="text" id="nome" required class="w-full bg-white/10 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-gold transition-colors" placeholder="Seu nome">
+                            </div>
+                            <div>
+                                <label for="whatsapp" class="block text-sm font-medium text-zinc-300 mb-2">WhatsApp / Telefone</label>
+                                <input type="tel" id="whatsapp" required class="w-full bg-white/10 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-gold transition-colors" placeholder="(61) 99999-9999">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="servico-select" class="block text-sm font-medium text-zinc-300 mb-2">Serviço Desejado</label>
+                                <select id="servico-select" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-gold transition-colors">
+                                    <option value="corte">Corte & Visagismo</option>
+                                    <option value="coloracao">Coloração e Mechas</option>
+                                    <option value="tratamento">Tratamento Capilar</option>
+                                    <option value="estetica">Estética Facial / Sobrancelhas</option>
+                                    <option value="noiva">Dia de Noiva</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="data" class="block text-sm font-medium text-zinc-300 mb-2">Melhor Data</label>
+                                <input type="date" id="data" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-gold transition-colors">
+                            </div>
+                        </div>
+
+                        <div class="pt-4 text-center">
+                            <button type="submit" class="w-full sm:w-auto bg-brand-gold hover:bg-brand-goldHover text-white px-10 py-4 rounded-full font-semibold transition-all shadow-lg">
+                                Solicitar Agendamento via WhatsApp
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- RODAPÉ & LOCALIZAÇÃO -->
+        <footer id="contato" class="bg-zinc-950 text-white pt-20 pb-12 border-t border-zinc-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+                <!-- Coluna 1 -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold tracking-wider uppercase text-white">
+                        <span class="text-brand-gold font-light">Aura</span> Brasília
+                    </h3>
+                    <p class="text-sm text-zinc-400">
+                        O salão de beleza referência em elegância, atendimento exclusivo e resultados impecáveis no Distrito Federal.
+                    </p>
+                    <div class="flex space-x-4 pt-2">
+                        <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white/10 hover:bg-brand-gold flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white/10 hover:bg-brand-gold flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a href="#" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white/10 hover:bg-brand-gold flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Horários -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-semibold text-brand-gold">Horário de Funcionamento</h4>
+                    <ul class="space-y-2 text-sm text-zinc-400">
+                        <li class="flex justify-between"><span>Terça a Sábado:</span> <span class="text-white">09:00 - 20:00</span></li>
+                        <li class="flex justify-between"><span>Domingo e Segunda:</span> <span class="text-zinc-500">Fechado</span></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Endereço -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-semibold text-brand-gold">Localização</h4>
+                    <p class="text-sm text-zinc-400">
+                        SHS Quadra 6, Bloco A, Sala 302<br>
+                        Asa Sul, Brasília - DF<br>
+                        CEP: 70316-000
+                    </p>
+                    <p class="text-sm text-brand-gold pt-1">
+                        <i class="fa-solid fa-phone mr-2"></i> (61) 99888-7766
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-600">
+                &copy; 2026 Aura Brasília Salão de Beleza. Todos os direitos reservados. Desenvolvido com foco em alta performance e acessibilidade.
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- WHATSAPP FLUTUANTE -->
+    <a href="https://wa.me/5561998887766?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20os%20serviços%20da%20Aura%20Brasília." target="_blank" rel="noopener noreferrer" aria-label="Contato via WhatsApp" class="fixed bottom-6 right-6 z-50 bg-[#25D366] hover:bg-[#20ba5a] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+    </a>
+
+    <!-- SCRIPTS DE COMPORTAMENTO -->
+    <script>
+        // Menu Mobile Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Fechar menu mobile ao clicar em um link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Simulação de Envio de Formulário Integrado ao WhatsApp
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            const servico = document.getElementById('servico-select').value;
+            const data = document.getElementById('data').value;
+
+            const texto = `Olá! Meu nome é *${nome}*. Gostaria de solicitar um agendamento para o serviço de *${servico}* na data *${data}*. Meu contato é ${whatsapp}.`;
+            const encodedText = encodeURIComponent(texto);
+            
+            window.open(`https://wa.me/5561998887766?text=${encodedText}`, '_blank');
+        }
+    </script>
+</body>
+</html>
