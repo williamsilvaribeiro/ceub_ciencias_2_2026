@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo da Memória — PlayHub</title>
+<script src="../assets/icons.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='rgb(15,23,42)'/><g fill='none' stroke='rgb(37,99,235)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'><rect x='20' y='62' width='60' height='24' rx='10'/><path d='M50 62V32'/><circle cx='50' cy='20' r='10'/></g><circle cx='33' cy='75' r='4' fill='rgb(34,197,94)'/><circle cx='67' cy='75' r='4' fill='rgb(34,197,94)'/></svg>">
+<script src="../assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0f172a">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/sfx.js" defer></script>
+<script src="../assets/pwa.js" defer></script>
+<script src="../assets/share.js" defer></script>
+<script src="../assets/photos.js"></script>
+<style>
+  .memgrid {
+    display: grid;
+    grid-template-columns: repeat(4, 112px);
+    grid-gap: 12px;
+  }
+  .card {
+    width: 112px;
+    height: 112px;
+    perspective: 600px;
+    cursor: pointer;
+  }
+  @media (max-width: 520px) {
+    .memgrid { grid-template-columns: repeat(4, 78px); grid-gap: 8px; }
+    .card { width: 78px; height: 78px; }
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.35s;
+    transform-style: preserve-3d;
+  }
+  .card.flipped .card-inner, .card.matched .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    backface-visibility: hidden;
+  }
+  .card-back {
+    background: linear-gradient(160deg, var(--card), var(--bg-alt));
+    border: 1px solid var(--border);
+  }
+  .card-front {
+    background: var(--bg-alt);
+    border: 1px solid var(--accent);
+    transform: rotateY(180deg);
+    overflow: hidden;
+  }
+  .card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card.matched .card-front {
+    border-color: var(--accent3);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.45);
+  }
+  #winMsg {
+    display: none;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--accent3);
+  }
+  .difficulty-row { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+  .theme-badge {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><span class="dot"></span>Play<span class="grad">Hub</span></a>
+    <div class="header-actions">
+      <a class="back-link" href="../about.html">Sobre</a>
+      <a class="back-link" href="../index.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Voltar ao início</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="game-shell">
+      <h1><svg class="h1-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="7" width="11" height="14" rx="2" transform="rotate(-10 8.5 14)"/><rect x="9" y="3" width="12" height="15" rx="2" fill="currentColor" fill-opacity="0.18"/></svg><span class="grad">Jogo da Memória</span></h1>
+      <div class="panel">
+        <div class="difficulty-row">
+          <button class="btn secondary" data-level="easy">Fácil (6 pares)</button>
+          <button class="btn secondary active" data-level="medium">Médio (8 pares)</button>
+          <button class="btn secondary" data-level="hard">Difícil (12 pares)</button>
+        </div>
+        <div class="hud">
+          <div>Jogadas: <strong id="moves">0</strong></div>
+          <div>Pares: <strong id="pairs">0</strong> / <strong id="pairsTotal">8</strong></div>
+          <div>Recorde: <strong id="bestMoves">—</strong></div>
+          <div class="theme-badge">Tema: <span id="themeName">—</span></div>
+        </div>
+        <div class="memgrid" id="memgrid"></div>
+        <div id="winMsg"><svg class="icon-inline" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.7 6 6.6.6-5 4.5 1.5 6.4L12 16.8 6.2 20l1.5-6.4-5-4.5 6.6-.6L12 2.5z"/></svg>Parabéns! Você encontrou todos os pares!</div>
+        <div class="controls-row">
+          <button class="btn" id="restartBtn">Embaralhar novamente</button>
+          <button class="btn secondary" id="shareBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Compartilhar</button>
+        </div>
+      </div>
+      <p class="hint">Clique em duas cartas para virá-las. Se forem iguais, elas permanecem viradas. As fotos são reais e buscadas de um tema aleatório (cachorros, gatos, raposas, pássaros, shibas ou Pokémon) a cada nova partida.</p>
+    </div>
+  </main>
+
+  <footer>Feito com HTML, CSS e JavaScript puros · PlayHub</footer>
+
+<script>
+const memgrid = document.getElementById('memgrid');
+const movesEl = document.getElementById('moves');
+const pairsEl = document.getElementById('pairs');
+const pairsTotalEl = document.getElementById('pairsTotal');
+const bestMovesEl = document.getElementById('bestMoves');
+const themeNameEl = document.getElementById('themeName');
+const winMsg = document.getElementById('winMsg');
+const restartBtn = document.getElementById('restartBtn');
+const difficultyBtns = document.querySelectorAll('.difficulty-row button');
+
+const LEVELS = { easy: 6, medium: 8, hard: 12 };
+
+let level = 'medium';
+let cards, flipped, matchedCount, moves, lock, pairsCount;
+let currentPhotoAlt = 'Foto';
+let currentIconTheme = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function setLevel(lv) {
+  level = lv;
+  difficultyBtns.forEach(b => b.classList.toggle('active', b.dataset.level === lv));
+  init();
+}
+
+async function init() {
+  pairsCount = LEVELS[level];
+  flipped = [];
+  matchedCount = 0;
+  moves = 0;
+  lock = false;
+  movesEl.textContent = moves;
+  pairsEl.textContent = matchedCount;
+  pairsTotalEl.textContent = pairsCount;
+  winMsg.style.display = 'none';
+
+  const best = localStorage.getItem('memory_best_' + level);
+  bestMovesEl.textContent = best || '—';
+
+  const source = PHOTO_SOURCES[randomPhotoSource()];
+  themeNameEl.textContent = 'Carregando fotos…';
+  memgrid.innerHTML = `<p class="loading-msg">Buscando ${source.label}...</p>`;
+  let chosenIcons = await source.fetch(pairsCount);
+  currentPhotoAlt = source.alt;
+
+  if (!chosenIcons) {
+    const themeKeys = Object.keys(MEMORY_THEMES);
+    const themeKey = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+    currentIconTheme = themeKey;
+    themeNameEl.textContent = `${themeKey} (sem internet, usando ícones)`;
+    chosenIcons = shuffle(MEMORY_THEMES[themeKey]).slice(0, pairsCount);
+  } else {
+    currentIconTheme = null;
+    themeNameEl.textContent = source.label;
+  }
+
+  cards = shuffle([...chosenIcons, ...chosenIcons]);
+  render();
+}
+
+function render() {
+  memgrid.innerHTML = '';
+  cards.forEach((icon, i) => {
+    const isPhoto = typeof icon === 'string' && icon.startsWith('http');
+    const front = isPhoto
+      ? `<img src="${icon}" alt="${currentPhotoAlt}" loading="lazy">`
+      : iconSVG(icon, { color: currentIconTheme ? MEMORY_THEME_COLORS[currentIconTheme] : undefined });
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.index = i;
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-back"></div>
+        <div class="card-face card-front">${front}</div>
+      </div>`;
+    card.addEventListener('click', () => flipCard(i, card));
+    memgrid.appendChild(card);
+  });
+}
+
+function flipCard(i, el) {
+  if (lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+  el.classList.add('flipped');
+  SFX.click();
+  flipped.push({ i, el });
+
+  if (flipped.length === 2) {
+    moves++;
+    movesEl.textContent = moves;
+    lock = true;
+    const [a, b] = flipped;
+    if (cards[a.i] === cards[b.i]) {
+      a.el.classList.add('matched');
+      b.el.classList.add('matched');
+      matchedCount++;
+      pairsEl.textContent = matchedCount;
+      flipped = [];
+      lock = false;
+      if (matchedCount === pairsCount) {
+        SFX.win();
+        winMsg.style.display = 'block';
+        const bestKey = 'memory_best_' + level;
+        const prevBest = Number(localStorage.getItem(bestKey));
+        if (!prevBest || moves < prevBest) {
+          localStorage.setItem(bestKey, moves);
+          bestMovesEl.textContent = moves;
+        }
+      } else {
+        SFX.match();
+      }
+    } else {
+      setTimeout(() => {
+        SFX.error();
+        a.el.classList.remove('flipped');
+        b.el.classList.remove('flipped');
+        flipped = [];
+        lock = false;
+      }, 800);
+    }
+  }
+}
+
+difficultyBtns.forEach(btn => {
+  btn.addEventListener('click', () => setLevel(btn.dataset.level));
+});
+restartBtn.addEventListener('click', init);
+document.getElementById('shareBtn').addEventListener('click', () => {
+  SHARE.score(`Joguei o Jogo da Memória (${pairsCount} pares) em ${moves} jogadas no PlayHub!`);
+});
+
+init();
+</script>
+</body>
+</html>
