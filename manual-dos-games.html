@@ -1,0 +1,749 @@
+<title>Manual dos Games</title>
+<style>
+  :root {
+    --bg: #E8E2D0;
+    --bg-raised: #DFD7BE;
+    --bg-raised-2: #D4CAAC;
+    --ink: #2B241C;
+    --ink-soft: #6A5F4D;
+    --accent-red: #C7492D;
+    --accent-red-ink: #FFF3EC;
+    --accent-teal: #2A6459;
+    --accent-mustard: #B9821F;
+    --accent-indigo: #3B4A8B;
+    --border: rgba(43, 36, 28, 0.2);
+    --border-strong: rgba(43, 36, 28, 0.38);
+    --shadow-step: #B9AD8C;
+
+    --font-display: "Arial Black", "Segoe UI Black", "Helvetica Neue", Arial, sans-serif;
+    --font-body: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Courier New", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171310;
+      --bg-raised: #211B15;
+      --bg-raised-2: #2A231B;
+      --ink: #ECE3CE;
+      --ink-soft: #B7AA8C;
+      --accent-red: #E27A57;
+      --accent-red-ink: #241009;
+      --accent-teal: #5EA394;
+      --accent-mustard: #E3B94F;
+      --accent-indigo: #8B98D6;
+      --border: rgba(236, 227, 206, 0.18);
+      --border-strong: rgba(236, 227, 206, 0.34);
+      --shadow-step: #0D0B08;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171310;
+    --bg-raised: #211B15;
+    --bg-raised-2: #2A231B;
+    --ink: #ECE3CE;
+    --ink-soft: #B7AA8C;
+    --accent-red: #E27A57;
+    --accent-red-ink: #241009;
+    --accent-teal: #5EA394;
+    --accent-mustard: #E3B94F;
+    --accent-indigo: #8B98D6;
+    --border: rgba(236, 227, 206, 0.18);
+    --border-strong: rgba(236, 227, 206, 0.34);
+    --shadow-step: #0D0B08;
+  }
+  :root[data-theme="light"] {
+    --bg: #E8E2D0;
+    --bg-raised: #DFD7BE;
+    --bg-raised-2: #D4CAAC;
+    --ink: #2B241C;
+    --ink-soft: #6A5F4D;
+    --accent-red: #C7492D;
+    --accent-red-ink: #FFF3EC;
+    --accent-teal: #2A6459;
+    --accent-mustard: #B9821F;
+    --accent-indigo: #3B4A8B;
+    --border: rgba(43, 36, 28, 0.2);
+    --border-strong: rgba(43, 36, 28, 0.38);
+    --shadow-step: #B9AD8C;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  a { color: var(--accent-indigo); }
+
+  :focus-visible {
+    outline: 3px solid var(--accent-mustard);
+    outline-offset: 2px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.6rem;
+  }
+
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .lede {
+    max-width: 42em;
+    color: var(--ink-soft);
+    margin: 0 0 2.2rem;
+  }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem clamp(1.2rem, 4vw, 3rem);
+    background: var(--bg);
+    border-bottom: 3px solid var(--border-strong);
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    white-space: nowrap;
+  }
+
+  .brand-led {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent-red);
+    box-shadow: 0 0 0 2px var(--bg), 0 0 6px 1px var(--accent-red);
+    animation: blink 2.6s steps(1) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .brand-led { animation: none; }
+  }
+  @keyframes blink { 0%, 70% { opacity: 1; } 71%, 100% { opacity: 0.25; } }
+
+  .brand-thin { font-weight: 400; color: var(--ink-soft); font-size: 0.85em; margin: 0 0.15em; }
+
+  .nav-links { display: flex; gap: clamp(0.9rem, 2vw, 1.6rem); flex-wrap: wrap; }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    padding: 0.3rem 0;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible { border-bottom-color: var(--accent-red); }
+
+  /* ---------- LAYOUT ---------- */
+  main { display: block; }
+  section {
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.2rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--border);
+  }
+  .content-col { max-width: 760px; margin: 0 auto; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-top: clamp(3rem, 8vw, 5.5rem);
+  }
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; }
+    .cart-wrap { order: -1; max-width: 260px; margin: 0 auto; }
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-shadow:
+      2px 0 0 var(--shadow-step),
+      0 2px 0 var(--shadow-step),
+      2px 2px 0 var(--shadow-step);
+    margin-bottom: 1rem;
+  }
+
+  .hero-sub {
+    color: var(--ink-soft);
+    max-width: 34em;
+    margin-bottom: 1.8rem;
+  }
+
+  .start-btn {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--accent-red);
+    color: var(--accent-red-ink);
+    border: 0;
+    border-radius: 3px;
+    padding: 0.9rem 1.6rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--shadow-step);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .start-btn:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--shadow-step); }
+  .start-btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--shadow-step); }
+  @media (prefers-reduced-motion: reduce) {
+    .start-btn { transition: none; }
+  }
+
+  /* ---------- CARTRIDGE ILLUSTRATION ---------- */
+  .cart-wrap { display: flex; justify-content: center; }
+  .cartridge {
+    width: 100%;
+    max-width: 260px;
+    aspect-ratio: 3 / 4;
+    background: var(--bg-raised);
+    border: 3px solid var(--ink);
+    border-radius: 10px 10px 4px 4px;
+    position: relative;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cartridge::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    transform: translateX(-50%);
+    width: 46%;
+    height: 16px;
+    background: var(--bg-raised);
+    border: 3px solid var(--ink);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+  }
+  .cart-notch {
+    align-self: center;
+    width: 34%;
+    height: 10px;
+    background: var(--bg);
+    border: 2px solid var(--ink);
+    border-radius: 0 0 4px 4px;
+    margin-top: -14px;
+  }
+  .cart-label {
+    flex: 1;
+    background: var(--accent-teal);
+    border: 2px solid var(--ink);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    color: #F3EFE1;
+  }
+  .cart-label strong {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+  }
+  .cart-label span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+  }
+  .cart-pins {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 3px;
+    padding: 0 4px;
+  }
+  .cart-pins span { height: 6px; background: var(--ink-soft); opacity: 0.5; border-radius: 1px; }
+
+  /* ---------- TIMELINE (details/summary) ---------- */
+  .timeline { display: flex; flex-direction: column; gap: 0.9rem; }
+  .era {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 0.2rem 1.1rem;
+  }
+  .era summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+  .era summary::-webkit-details-marker { display: none; }
+  .era summary::before {
+    content: "▸";
+    color: var(--accent-red);
+    font-size: 0.85em;
+    transition: transform 0.15s ease;
+    flex: none;
+  }
+  .era[open] summary::before { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) {
+    .era summary::before { transition: none; }
+  }
+  .era-year {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-teal);
+    white-space: nowrap;
+    flex: none;
+  }
+  .era-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+  .era p {
+    margin: 0 0 1.1rem;
+    color: var(--ink-soft);
+    padding-left: calc(0.85em + 1rem + 4.2ch);
+  }
+  @media (max-width: 560px) {
+    .era summary { flex-wrap: wrap; }
+    .era p { padding-left: 1.3em; }
+  }
+
+  /* ---------- GENRES (flip cards) ---------- */
+  .genre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .genre-card { perspective: 1200px; }
+  .flip-toggle {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .genre-inner {
+    position: relative;
+    display: block;
+    height: 190px;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.2, 0.6, 0.3, 1);
+  }
+  .flip-toggle:checked ~ .genre-inner { transform: rotateY(180deg); }
+  .flip-toggle:focus-visible ~ .genre-inner { outline: 3px solid var(--accent-mustard); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .genre-inner { transition: none; }
+  }
+  .genre-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .genre-face.front { background: var(--bg-raised); }
+  .genre-face.back {
+    background: var(--accent-indigo);
+    color: #F2F1FA;
+    transform: rotateY(180deg);
+    justify-content: center;
+  }
+  .genre-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+  }
+  .genre-face h3 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    text-transform: uppercase;
+  }
+  .genre-hint {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .genre-face.back p { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 1.3rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-card p.question {
+    font-weight: bold;
+    margin: 0 0 0.8rem;
+  }
+  .quiz-card fieldset { border: 0; margin: 0; padding: 0; }
+  .quiz-option {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    cursor: pointer;
+  }
+  .quiz-option input { margin: 0; accent-color: var(--accent-red); }
+  .quiz-card.correct { border-color: var(--accent-teal); box-shadow: inset 0 0 0 1px var(--accent-teal); }
+  .quiz-card.wrong { border-color: var(--accent-red); box-shadow: inset 0 0 0 1px var(--accent-red); }
+  .quiz-feedback {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    margin-top: 0.7rem;
+    min-height: 1.2em;
+  }
+  .quiz-feedback.show-correct { color: var(--accent-teal); }
+  .quiz-feedback.show-wrong { color: var(--accent-red); }
+
+  .quiz-actions { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-top: 1.2rem; }
+  .check-btn {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--accent-teal);
+    color: #F3EFE1;
+    border: 0;
+    border-radius: 3px;
+    padding: 0.75rem 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--shadow-step);
+  }
+  .check-btn:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--shadow-step); }
+  .score-readout {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    background: var(--bg-raised-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 0.5rem 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    background: var(--accent-teal);
+    color: #F3EFE1;
+    padding: 2.4rem clamp(1.2rem, 4vw, 3rem) 3rem;
+    text-align: center;
+  }
+  footer .foot-title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  footer p { margin: 0.3rem 0; opacity: 0.9; font-size: 0.88rem; }
+  footer .fine-print { font-family: var(--font-mono); font-size: 0.68rem; opacity: 0.75; margin-top: 1rem; letter-spacing: 0.04em; }
+</style>
+
+<header class="nav">
+  <div class="brand"><span class="brand-led" aria-hidden="true"></span>MANUAL<span class="brand-thin">dos</span>GAMES</div>
+  <nav class="nav-links">
+    <a href="#linha-do-tempo">Linha do Tempo</a>
+    <a href="#generos">Gêneros</a>
+    <a href="#curiosidades">Curiosidades</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="topo">
+    <div>
+      <p class="eyebrow">Manual de Instruções · Vol. 1</p>
+      <h1 class="hero-title">O Mundo dos Videogames</h1>
+      <p class="hero-sub">Da tela em preto e verde dos fliperamas às telas 4K de hoje: uma jornada rápida — e divertida — pela história, os gêneros e as curiosidades que moldaram os jogos eletrônicos.</p>
+      <button class="start-btn" type="button" data-scroll-to="#linha-do-tempo">Pressione Start</button>
+    </div>
+    <div class="cart-wrap" aria-hidden="true">
+      <div class="cartridge">
+        <div class="cart-pins">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="cart-label">
+          <strong>GAMES</strong>
+          <span>VOL. 1 · MANUAL</span>
+        </div>
+        <div class="cart-notch"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="linha-do-tempo">
+    <div class="content-col">
+      <p class="eyebrow">Página 01</p>
+      <h2>Linha do Tempo: 50 Anos de Jogos</h2>
+      <p class="lede">Clique em cada década para abrir a página do manual e ler o que aconteceu.</p>
+      <div class="timeline">
+        <details class="era" open>
+          <summary><span class="era-year">1970s</span><span class="era-title">Era Arcade</span></summary>
+          <p>Pong (1972) e Space Invaders (1978) tiraram os jogos eletrônicos dos laboratórios de pesquisa e os colocaram em bares e fliperamas do mundo todo, criando a primeira geração de jogadores.</p>
+        </details>
+        <details class="era">
+          <summary><span class="era-year">1980s</span><span class="era-title">Consoles em Casa</span></summary>
+          <p>O excesso de jogos de baixa qualidade quase quebrou a indústria em 1983. O NES (Nintendo Entertainment System), lançado em 1985 com o encanador mais famoso do mundo, reconstruiu a confiança do público nos videogames.</p>
+        </details>
+        <details class="era">
+          <summary><span class="era-year">1990s</span><span class="era-title">A Corrida para o 3D</span></summary>
+          <p>Super Nintendo e Mega Drive disputaram o mercado dos 16-bits, enquanto PlayStation e Nintendo 64 levaram os jogadores para mundos totalmente tridimensionais.</p>
+        </details>
+        <details class="era">
+          <summary><span class="era-year">2000s</span><span class="era-title">Tudo Fica Online</span></summary>
+          <p>Xbox Live e a popularização da banda larga transformaram jogar em uma atividade social e conectada, enquanto PS3 e Xbox 360 trouxeram a alta definição para a sala de estar.</p>
+        </details>
+        <details class="era">
+          <summary><span class="era-year">2010–20s</span><span class="era-title">Indies, Mobile e Streaming</span></summary>
+          <p>O Steam abriu espaço para pequenos estúdios criarem sucessos indie, os jogos para celular alcançaram bilhões de pessoas e serviços como Twitch transformaram assistir alguém jogar em um passatempo próprio.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="generos">
+    <div class="content-col">
+      <p class="eyebrow">Página 02</p>
+      <h2>Escolha seu Gênero</h2>
+      <p class="lede">Clique em um cartucho para ver do que ele se trata.</p>
+    </div>
+    <div class="genre-grid">
+      <div class="genre-card">
+        <input type="checkbox" id="g1" class="flip-toggle">
+        <label for="g1" class="genre-inner">
+          <div class="genre-face front">
+            <span class="genre-tag">Nº 01</span>
+            <h3>Plataforma</h3>
+            <span class="genre-hint">clique para abrir</span>
+          </div>
+          <div class="genre-face back">
+            <p>Pular, correr e desviar de obstáculos pelas fases. Super Mario Bros. e Sonic the Hedgehog definiram o gênero nos anos 80 e 90.</p>
+          </div>
+        </label>
+      </div>
+      <div class="genre-card">
+        <input type="checkbox" id="g2" class="flip-toggle">
+        <label for="g2" class="genre-inner">
+          <div class="genre-face front">
+            <span class="genre-tag">Nº 02</span>
+            <h3>RPG</h3>
+            <span class="genre-hint">clique para abrir</span>
+          </div>
+          <div class="genre-face back">
+            <p>Foco em evolução de personagem, histórias longas e escolhas. Final Fantasy e The Witcher são referências do gênero.</p>
+          </div>
+        </label>
+      </div>
+      <div class="genre-card">
+        <input type="checkbox" id="g3" class="flip-toggle">
+        <label for="g3" class="genre-inner">
+          <div class="genre-face front">
+            <span class="genre-tag">Nº 03</span>
+            <h3>FPS</h3>
+            <span class="genre-hint">clique para abrir</span>
+          </div>
+          <div class="genre-face back">
+            <p>Ação vista pelos olhos do personagem. Doom ajudou a popularizar o formato nos anos 90; hoje franquias como Call of Duty dominam o gênero.</p>
+          </div>
+        </label>
+      </div>
+      <div class="genre-card">
+        <input type="checkbox" id="g4" class="flip-toggle">
+        <label for="g4" class="genre-inner">
+          <div class="genre-face front">
+            <span class="genre-tag">Nº 04</span>
+            <h3>Puzzle</h3>
+            <span class="genre-hint">clique para abrir</span>
+          </div>
+          <div class="genre-face back">
+            <p>Desafios de lógica e raciocínio espacial. Tetris (1984) é um dos jogos mais licenciados e vendidos de todos os tempos.</p>
+          </div>
+        </label>
+      </div>
+      <div class="genre-card">
+        <input type="checkbox" id="g5" class="flip-toggle">
+        <label for="g5" class="genre-inner">
+          <div class="genre-face front">
+            <span class="genre-tag">Nº 05</span>
+            <h3>Mundo Aberto</h3>
+            <span class="genre-hint">clique para abrir</span>
+          </div>
+          <div class="genre-face back">
+            <p>O jogador explora um cenário grande e não-linear no seu próprio ritmo, como em The Legend of Zelda e Grand Theft Auto.</p>
+          </div>
+        </label>
+      </div>
+      <div class="genre-card">
+        <input type="checkbox" id="g6" class="flip-toggle">
+        <label for="g6" class="genre-inner">
+          <div class="genre-face front">
+            <span class="genre-tag">Nº 06</span>
+            <h3>Indie</h3>
+            <span class="genre-hint">clique para abrir</span>
+          </div>
+          <div class="genre-face back">
+            <p>Jogos de estúdios pequenos ou independentes, muitas vezes com propostas criativas fora do padrão das grandes produtoras, como Stardew Valley e Hollow Knight.</p>
+          </div>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section id="curiosidades">
+    <div class="content-col">
+      <p class="eyebrow">Página 03</p>
+      <h2>Teste seus Conhecimentos</h2>
+      <p class="lede">Responda e clique em "Conferir respostas" para ver sua pontuação.</p>
+
+      <form id="quiz-form">
+        <div class="quiz-card" data-answer="pong">
+          <p class="question">1. Qual jogo de arcade da Atari, de 1972, é considerado um dos primeiros grandes sucessos comerciais dos videogames?</p>
+          <fieldset>
+            <label class="quiz-option"><input type="radio" name="q1" value="pacman"> Pac-Man</label>
+            <label class="quiz-option"><input type="radio" name="q1" value="pong"> Pong</label>
+            <label class="quiz-option"><input type="radio" name="q1" value="tetris"> Tetris</label>
+          </fieldset>
+          <p class="quiz-feedback"></p>
+        </div>
+
+        <div class="quiz-card" data-answer="nes">
+          <p class="question">2. Qual console, lançado em 1985, é apontado como responsável por reerguer a indústria após a crise de 1983?</p>
+          <fieldset>
+            <label class="quiz-option"><input type="radio" name="q2" value="genesis"> Sega Genesis</label>
+            <label class="quiz-option"><input type="radio" name="q2" value="nes"> NES</label>
+            <label class="quiz-option"><input type="radio" name="q2" value="gameboy"> Game Boy</label>
+          </fieldset>
+          <p class="quiz-feedback"></p>
+        </div>
+
+        <div class="quiz-card" data-answer="minecraft">
+          <p class="question">3. Segundo estimativas de vendas, qual destes é o jogo mais vendido da história?</p>
+          <fieldset>
+            <label class="quiz-option"><input type="radio" name="q3" value="gtav"> GTA V</label>
+            <label class="quiz-option"><input type="radio" name="q3" value="minecraft"> Minecraft</label>
+            <label class="quiz-option"><input type="radio" name="q3" value="wiisports"> Wii Sports</label>
+          </fieldset>
+          <p class="quiz-feedback"></p>
+        </div>
+
+        <div class="quiz-card" data-answer="puzzle">
+          <p class="question">4. Qual gênero é definido por desafios de lógica e raciocínio espacial, como em Tetris e Portal?</p>
+          <fieldset>
+            <label class="quiz-option"><input type="radio" name="q4" value="rpg"> RPG</label>
+            <label class="quiz-option"><input type="radio" name="q4" value="puzzle"> Puzzle</label>
+            <label class="quiz-option"><input type="radio" name="q4" value="fps"> FPS</label>
+          </fieldset>
+          <p class="quiz-feedback"></p>
+        </div>
+
+        <div class="quiz-actions">
+          <button type="submit" class="check-btn">Conferir Respostas</button>
+          <span class="score-readout" id="score-readout" aria-live="polite">PONTOS: —</span>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="foot-title">Fim de Jogo? Não Mesmo.</p>
+  <p>A história dos videogames continua sendo escrita — o próximo capítulo pode ser o jogo que você criar.</p>
+  <p class="fine-print">MANUAL DOS GAMES · COMPATÍVEL COM NOSTALGIA E CURIOSIDADE · SEM PILHAS NECESSÁRIAS</p>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-scroll-to]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.querySelector(btn.getAttribute('data-scroll-to'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  var form = document.getElementById('quiz-form');
+  var readout = document.getElementById('score-readout');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var cards = form.querySelectorAll('.quiz-card');
+    var score = 0;
+
+    cards.forEach(function (card) {
+      var correct = card.getAttribute('data-answer');
+      var checked = card.querySelector('input[type="radio"]:checked');
+      var feedback = card.querySelector('.quiz-feedback');
+      card.classList.remove('correct', 'wrong');
+      feedback.classList.remove('show-correct', 'show-wrong');
+
+      if (!checked) {
+        feedback.textContent = 'Escolha uma resposta antes de conferir.';
+        return;
+      }
+      if (checked.value === correct) {
+        score++;
+        card.classList.add('correct');
+        feedback.classList.add('show-correct');
+        feedback.textContent = 'Acertou!';
+      } else {
+        card.classList.add('wrong');
+        feedback.classList.add('show-wrong');
+        var correctLabel = card.querySelector('input[value="' + correct + '"]').closest('label').textContent.trim();
+        feedback.textContent = 'Quase — a resposta certa é "' + correctLabel + '".';
+      }
+    });
+
+    readout.textContent = 'PONTOS: ' + score + '/' + cards.length;
+  });
+</script>
