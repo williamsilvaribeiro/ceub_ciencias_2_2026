@@ -174,6 +174,7 @@
     align-items: center;
     gap: 0.2rem;
     width: 22%;
+    transition: left 0.45s cubic-bezier(.4,0,.2,1), top 0.45s cubic-bezier(.4,0,.2,1);
   }
   .pitch-slot .ps-dot {
     width: 32px; height: 32px;
@@ -188,6 +189,8 @@
   .pitch-slot.filled .ps-dot { background: var(--accent3); border: 2px solid var(--accent3); color: #04140a; font-size: 0.62rem; }
   .pitch-slot.clickable { cursor: pointer; }
   .pitch-slot.clickable .ps-dot:hover { border-color: var(--accent); }
+  .pitch-slot.disabled .ps-dot { opacity: 0.35; }
+  .pitch-slot.disabled .ps-name { opacity: 0.45; }
   .pitch-slot.active .ps-dot { border-color: var(--accent2); box-shadow: 0 0 0 4px rgba(var(--accent2-rgb), 0.3); animation: slot-pulse 1s ease-in-out infinite; }
   @keyframes slot-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
   .pitch-slot .ps-name {
@@ -217,6 +220,29 @@
   .pos-breakdown span.ok { color: var(--accent3); }
 
   .player-card.pos-full { opacity: 0.25; cursor: not-allowed; }
+
+  .pending-pick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    background: rgba(var(--accent2-rgb), 0.1);
+    border: 1px solid rgba(var(--accent2-rgb), 0.4);
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+  .pending-pick #pendingPickText strong { color: var(--accent2); }
+  .pending-cancel-btn {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.6rem;
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .pending-cancel-btn:hover { box-shadow: 0 0 14px rgba(var(--accent2-rgb), 0.3); }
 
   .live-badge {
     display: inline-flex;
@@ -256,13 +282,18 @@
 
   <main>
     <div class="game-shell">
-      <h1><svg class="h1-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z" fill="currentColor" fill-opacity="0.22"/><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z"/><path d="M7 4.5H4.2a2.8 2.8 0 0 0 2.8 4.6M17 4.5h2.8a2.8 2.8 0 0 1-2.8 4.6"/><path d="M12 13v3.5"/><path d="M8.5 20.5h7"/><path d="M9.5 16.5h5v4h-5z"/></svg>Fantasy World Cup</h1>
+      <h1><svg class="h1-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z" fill="currentColor" fill-opacity="0.22"/><path d="M7 3.5h10v4.5a5 5 0 0 1-10 0V3.5z"/><path d="M7 4.5H4.2a2.8 2.8 0 0 0 2.8 4.6M17 4.5h2.8a2.8 2.8 0 0 1-2.8 4.6"/><path d="M12 13v3.5"/><path d="M8.5 20.5h7"/><path d="M9.5 16.5h5v4h-5z"/></svg><span class="grad">Fantasy World Cup</span></h1>
 
       <!-- FORMATION SCREEN -->
       <div class="panel wc-shell" id="screenFormation">
-        <div class="wc-progress">Escolha a formação do seu time</div>
+        <div class="wc-progress">Escolha o estilo e a formação do seu time</div>
+        <div class="tactic-row" id="styleRow">
+          <button class="btn secondary" data-style="of"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21L10 14M21 3L14 10M14 14l7 7M10 10L3 3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>Ofensiva</button>
+          <button class="btn secondary active" data-style="eq"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 7h12M6 7l-3 6a3 3 0 0 0 6 0L6 7zM18 7l-3 6a3 3 0 0 0 6 0L18 7z"/></svg>Equilibrada</button>
+          <button class="btn secondary" data-style="def"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg>Defensiva</button>
+        </div>
         <div class="formation-grid" id="formationGrid"></div>
-        <p class="hint">A formação define quantos jogadores de cada posição você pode escalar como titular. As 5 reservas podem ser de qualquer posição.</p>
+        <p class="hint">O estilo muda a escalação de verdade, não é só visual: Ofensiva troca uma vaga de meio-campo por um atacante a mais (linha adiantada); Defensiva troca uma vaga de ataque por um meio-campista a mais (linha recuada). Isso vale pro jogo inteiro. As 5 reservas podem ser de qualquer posição.</p>
       </div>
 
       <!-- DRAFT SCREEN -->
@@ -271,12 +302,16 @@
         <div class="pos-breakdown" id="posBreakdown"></div>
         <div class="pitch-wrap" id="draftPitchWrap"></div>
         <div class="wc-progress" id="slotHint" style="font-size: 0.95rem;"></div>
+        <div class="pending-pick hidden" id="pendingPickBar">
+          <span id="pendingPickText"></span>
+          <button class="btn secondary pending-cancel-btn" id="cancelPickBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Desmarcar</button>
+        </div>
         <div class="controls-row">
           <button class="btn" id="spinBtn"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Girar Roleta</button>
         </div>
         <div class="roulette-team" id="rouletteTeam"></div>
         <div class="player-grid" id="playerGrid"></div>
-        <p class="hint">Gire a roleta para sortear uma seleção histórica real. Cada vaga do campo é uma posição específica (ponta, volante, meia, lateral...) — só entram jogadores compatíveis com a vaga selecionada. Clique num jogador já escalado para tirá-lo do campo e escolher outro.</p>
+        <p class="hint">Escolha um jogador na roleta, depois clique na vaga do campo onde ele vai jogar — cada vaga é uma posição específica (ponta, volante, meia, lateral...), só aceita jogadores compatíveis. Escalação é definitiva: uma vez no campo, o jogador não sai mais. Se errar antes de confirmar a posição, use "Desmarcar".</p>
       </div>
 
       <!-- TOURNAMENT HUB SCREEN -->
@@ -298,6 +333,7 @@
         <div class="score-big" id="scoreBig">0 x 0</div>
         <div class="live-badge hidden" id="liveBadge"><span class="dot-live"></span> AO VIVO — BOLA ROLANDO</div>
         <div id="tacticArea">
+          <div class="pitch-wrap" id="matchPitch" style="margin-bottom: 0.8rem;"></div>
           <div class="wc-progress" id="tacticLabel">Escolha a postura do 1º tempo</div>
           <div class="tactic-row" id="tacticRow">
             <button class="btn secondary" data-tactic="of"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21L10 14M21 3L14 10M14 14l7 7M10 10L3 3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>Ofensiva</button>
@@ -457,6 +493,70 @@ const SQUADS = [
     {name:'Pelé', pos:'ATA', ovr:96}, {name:'Zagallo', pos:'MEI', ovr:83},
     {name:'Castilho', pos:'GOL', ovr:74}, {name:'Mauro Ramos', pos:'ZAG', ovr:78}, {name:'Pepe', pos:'ATA', ovr:79},
     {name:'Julinho', pos:'ATA', ovr:80}, {name:'De Sordi', pos:'ZAG', ovr:75}
+  ]},
+  { id: 'br1994', label: 'Brasil 1994', flag: '🇧🇷', players: [
+    {name:'Taffarel', pos:'GOL', ovr:87}, {name:'Jorginho', pos:'ZAG', ovr:82}, {name:'Ricardo Rocha', pos:'ZAG', ovr:80},
+    {name:'Márcio Santos', pos:'ZAG', ovr:78}, {name:'Branco', pos:'ZAG', ovr:85}, {name:'Mauro Silva', pos:'MEI', ovr:86},
+    {name:'Dunga', pos:'MEI', ovr:87}, {name:'Zinho', pos:'MEI', ovr:81}, {name:'Mazinho', pos:'MEI', ovr:80},
+    {name:'Romário', pos:'ATA', ovr:95}, {name:'Bebeto', pos:'ATA', ovr:89},
+    {name:'Cafu', pos:'ZAG', ovr:84}, {name:'Aldair', pos:'ZAG', ovr:85}, {name:'Raí', pos:'MEI', ovr:83},
+    {name:'Zetti', pos:'GOL', ovr:75}, {name:'Ronaldo', pos:'ATA', ovr:80}
+  ]},
+  { id: 'de1974', label: 'Alemanha 1974', flag: '🇩🇪', players: [
+    {name:'Sepp Maier', pos:'GOL', ovr:92}, {name:'Berti Vogts', pos:'ZAG', ovr:86}, {name:'Hans-Georg Schwarzenbeck', pos:'ZAG', ovr:82},
+    {name:'Franz Beckenbauer', pos:'ZAG', ovr:98}, {name:'Paul Breitner', pos:'ZAG', ovr:88}, {name:'Uli Hoeneß', pos:'MEI', ovr:83},
+    {name:'Wolfgang Overath', pos:'MEI', ovr:87}, {name:'Rainer Bonhof', pos:'MEI', ovr:84}, {name:'Jürgen Grabowski', pos:'ATA', ovr:85},
+    {name:'Gerd Müller', pos:'ATA', ovr:96}, {name:'Bernd Hölzenbein', pos:'ATA', ovr:84},
+    {name:'Norbert Nigbur', pos:'GOL', ovr:74}, {name:'Jupp Kapellmann', pos:'ZAG', ovr:76}, {name:'Günter Netzer', pos:'MEI', ovr:88},
+    {name:'Herbert Wimmer', pos:'MEI', ovr:78}, {name:'Jupp Heynckes', pos:'ATA', ovr:85}
+  ]},
+  { id: 'de1954', label: 'Alemanha 1954', flag: '🇩🇪', players: [
+    {name:'Toni Turek', pos:'GOL', ovr:84}, {name:'Josef Posipal', pos:'ZAG', ovr:78}, {name:'Werner Liebrich', pos:'ZAG', ovr:80},
+    {name:'Werner Kohlmeyer', pos:'ZAG', ovr:79}, {name:'Horst Eckel', pos:'MEI', ovr:79}, {name:'Karl Mai', pos:'MEI', ovr:76},
+    {name:'Helmut Rahn', pos:'ATA', ovr:86}, {name:'Max Morlock', pos:'ATA', ovr:82}, {name:'Ottmar Walter', pos:'ATA', ovr:81},
+    {name:'Fritz Walter', pos:'ATA', ovr:90}, {name:'Hans Schäfer', pos:'ATA', ovr:82},
+    {name:'Fritz Laband', pos:'ZAG', ovr:73}, {name:'Herbert Erhardt', pos:'ZAG', ovr:74}, {name:'Alfred Pfaff', pos:'MEI', ovr:75},
+    {name:'Bernhard Klodt', pos:'ATA', ovr:76}, {name:'Heinz Kwiatkowski', pos:'GOL', ovr:72}
+  ]},
+  { id: 'hu1954', label: 'Hungria 1954', flag: '🇭🇺', players: [
+    {name:'Gyula Grosics', pos:'GOL', ovr:88}, {name:'Jenő Buzánszky', pos:'ZAG', ovr:82}, {name:'Gyula Lóránt', pos:'ZAG', ovr:83},
+    {name:'Mihály Lantos', pos:'ZAG', ovr:81}, {name:'József Bozsik', pos:'MEI', ovr:88}, {name:'Zoltán Zakariás', pos:'MEI', ovr:78},
+    {name:'József Tóth', pos:'MEI', ovr:77}, {name:'Sándor Kocsis', pos:'ATA', ovr:93}, {name:'Nándor Hidegkuti', pos:'ATA', ovr:90},
+    {name:'Ferenc Puskás', pos:'ATA', ovr:98}, {name:'Zoltán Czibor', pos:'ATA', ovr:87},
+    {name:'Jenő Kárpáti', pos:'ZAG', ovr:75}, {name:'Imre Szojka', pos:'ZAG', ovr:72}, {name:'József Budai', pos:'ATA', ovr:82},
+    {name:'Mihály Tóth', pos:'ATA', ovr:76}, {name:'Károly Machos', pos:'GOL', ovr:71}
+  ]},
+  { id: 'nl1974', label: 'Holanda 1974', flag: '🇳🇱', players: [
+    {name:'Jan Jongbloed', pos:'GOL', ovr:82}, {name:'Wim Suurbier', pos:'ZAG', ovr:83}, {name:'Wim Rijsbergen', pos:'ZAG', ovr:79},
+    {name:'Ruud Krol', pos:'ZAG', ovr:89}, {name:'Arie Haan', pos:'ZAG', ovr:85}, {name:'Wim Jansen', pos:'MEI', ovr:82},
+    {name:'Johan Neeskens', pos:'MEI', ovr:92}, {name:'Wim Van Hanegem', pos:'MEI', ovr:88}, {name:'Johnny Rep', pos:'ATA', ovr:87},
+    {name:'Johan Cruyff', pos:'ATA', ovr:98}, {name:'Rob Rensenbrink', pos:'ATA', ovr:86},
+    {name:'Piet Schrijvers', pos:'GOL', ovr:75}, {name:'Theo De Jong', pos:'ZAG', ovr:77}, {name:'Willy Van De Kerkhof', pos:'MEI', ovr:79},
+    {name:'René Van De Kerkhof', pos:'ATA', ovr:80}, {name:'Piet Keizer', pos:'ATA', ovr:81}
+  ]},
+  { id: 'it2006', label: 'Itália 2006', flag: '🇮🇹', players: [
+    {name:'Gianluigi Buffon', pos:'GOL', ovr:96}, {name:'Gianluca Zambrotta', pos:'ZAG', ovr:86}, {name:'Fabio Cannavaro', pos:'ZAG', ovr:94},
+    {name:'Marco Materazzi', pos:'ZAG', ovr:82}, {name:'Fabio Grosso', pos:'ZAG', ovr:83}, {name:'Gennaro Gattuso', pos:'MEI', ovr:85},
+    {name:'Andrea Pirlo', pos:'MEI', ovr:92}, {name:'Mauro Camoranesi', pos:'MEI', ovr:81}, {name:'Simone Perrotta', pos:'MEI', ovr:82},
+    {name:'Francesco Totti', pos:'ATA', ovr:91}, {name:'Luca Toni', pos:'ATA', ovr:86},
+    {name:'Angelo Peruzzi', pos:'GOL', ovr:79}, {name:'Alessandro Nesta', pos:'ZAG', ovr:90}, {name:'Daniele De Rossi', pos:'MEI', ovr:84},
+    {name:'Alessandro Del Piero', pos:'ATA', ovr:88}, {name:'Vincenzo Iaquinta', pos:'ATA', ovr:78}
+  ]},
+  { id: 'uy2010', label: 'Uruguai 2010', flag: '🇺🇾', players: [
+    {name:'Fernando Muslera', pos:'GOL', ovr:85}, {name:'Diego Lugano', pos:'ZAG', ovr:86}, {name:'Diego Godín', pos:'ZAG', ovr:88},
+    {name:'Mauricio Victorino', pos:'ZAG', ovr:78}, {name:'Maximiliano Pereira', pos:'ZAG', ovr:80}, {name:'Álvaro Pereira', pos:'MEI', ovr:81},
+    {name:'Walter Gargano', pos:'MEI', ovr:80}, {name:'Diego Pérez', pos:'MEI', ovr:79}, {name:'Egidio Arévalo', pos:'MEI', ovr:78},
+    {name:'Diego Forlán', pos:'ATA', ovr:92}, {name:'Luis Suárez', pos:'ATA', ovr:90},
+    {name:'Juan Castillo', pos:'GOL', ovr:73}, {name:'Jorge Fucile', pos:'ZAG', ovr:76}, {name:'Sebastián Eguren', pos:'MEI', ovr:77},
+    {name:'Edinson Cavani', pos:'ATA', ovr:84}, {name:'Sebastián Abreu', pos:'ATA', ovr:83}
+  ]},
+  { id: 'hr2018', label: 'Croácia 2018', flag: '🇭🇷', players: [
+    {name:'Danijel Subašić', pos:'GOL', ovr:86}, {name:'Šime Vrsaljko', pos:'ZAG', ovr:84}, {name:'Dejan Lovren', pos:'ZAG', ovr:82},
+    {name:'Domagoj Vida', pos:'ZAG', ovr:83}, {name:'Ivan Strinić', pos:'ZAG', ovr:79}, {name:'Ivan Rakitić', pos:'MEI', ovr:88},
+    {name:'Luka Modrić', pos:'MEI', ovr:96}, {name:'Marcelo Brozović', pos:'MEI', ovr:85}, {name:'Ivan Perišić', pos:'ATA', ovr:87},
+    {name:'Mario Mandžukić', pos:'ATA', ovr:88}, {name:'Ante Rebić', pos:'ATA', ovr:83},
+    {name:'Dominik Livaković', pos:'GOL', ovr:76}, {name:'Vedran Ćorluka', pos:'ZAG', ovr:78}, {name:'Mateo Kovačić', pos:'MEI', ovr:84},
+    {name:'Josip Pivarić', pos:'ZAG', ovr:75}, {name:'Andrej Kramarić', pos:'ATA', ovr:82}
   ]}
 ];
 
@@ -547,6 +647,34 @@ function formationCounts(f) {
   return c;
 }
 
+// Chosen upfront alongside the formation (not just an in-match visual): each
+// style REPLACES one slot's actual position — Ofensiva turns a defensive
+// midfielder into an extra forward, Defensiva turns a wide attacker into an
+// extra midfielder (or, for 4-2-3-1 which already has just one striker, into
+// an extra defender). This changes chosenFormation.counts for the whole
+// draft, so the squad you build — not just the pitch picture — is genuinely
+// more advanced or more withdrawn.
+const STYLE_ADJUST = {
+  '442':  { of: { slotKey: 'VOL',  broad: 'ATA', label: 'Segundo Atacante', short: 'SA', x: 38, y: 30 },
+            def: { slotKey: 'CA2', broad: 'MEI', label: 'Volante',         short: 'VOL', x: 50, y: 66 } },
+  '433':  { of: { slotKey: 'VOL',  broad: 'ATA', label: 'Segundo Atacante', short: 'SA', x: 50, y: 32 },
+            def: { slotKey: 'PE',  broad: 'MEI', label: 'Volante',         short: 'VOL', x: 16, y: 62 } },
+  '352':  { of: { slotKey: 'VOL1', broad: 'ATA', label: 'Segundo Atacante', short: 'SA', x: 37, y: 30 },
+            def: { slotKey: 'CA2', broad: 'MEI', label: 'Volante',         short: 'VOL', x: 50, y: 70 } },
+  '532':  { of: { slotKey: 'VOL1', broad: 'ATA', label: 'Segundo Atacante', short: 'SA', x: 30, y: 28 },
+            def: { slotKey: 'CA2', broad: 'MEI', label: 'Volante',         short: 'VOL', x: 50, y: 64 } },
+  '4231': { of: { slotKey: 'VOL2', broad: 'ATA', label: 'Segundo Atacante', short: 'SA', x: 64, y: 20 },
+            def: { slotKey: 'PD',  broad: 'ZAG', label: 'Ala Direita',     short: 'LD', x: 90, y: 56 } },
+};
+
+function styledFormation(base, styleKey) {
+  const adjust = STYLE_ADJUST[base.key] && STYLE_ADJUST[base.key][styleKey];
+  const slots = base.slots.map(s => (adjust && s.key === adjust.slotKey) ? { ...s, ...adjust } : { ...s });
+  const styled = { key: base.key, label: base.label, slots };
+  styled.counts = formationCounts(styled);
+  return styled;
+}
+
 function miniPitchHTML(f) {
   const dots = f.slots.map(s => `<div class="pm-dot" style="left:${s.x}%;top:${s.y}%" title="${s.label}"></div>`).join('');
   return `<div class="pitch-mini"><div class="pm-line"></div><div class="pm-circle"></div>${dots}</div>`;
@@ -555,18 +683,50 @@ function miniPitchHTML(f) {
 // Renders a formation's pitch: filled slots show the player's ovr + name,
 // empty slots show the position's short code. interactive+onSlotClick wires
 // up the draft screen; the pre-match hub renders the same pitch read-only.
+// Shifts a slot's base coordinate to reflect a tactical posture: Ofensiva
+// pushes outfield lines up and spreads them wide, Defensiva pulls them back
+// toward goal and compacts them narrow, Equilibrada keeps the formation's
+// original shape. The goalkeeper never moves. Defenders shift the least
+// (they can't abandon the back line), attackers shift the most.
+const TACTIC_Y_SHIFT = { of: -9, eq: 0, def: 9 };
+const TACTIC_X_PULL = { of: 1.08, eq: 1, def: 0.86 };
+const TACTIC_BROAD_WEIGHT = { ZAG: 0.45, MEI: 1, ATA: 1.25 };
+
+function tacticalCoord(s, tacticKey) {
+  if (!tacticKey || s.broad === 'GOL') return { x: s.x, y: s.y };
+  const yShift = TACTIC_Y_SHIFT[tacticKey] || 0;
+  const weight = TACTIC_BROAD_WEIGHT[s.broad] || 0.8;
+  const y = clamp(s.y + yShift * weight, 6, 90);
+  const xPull = TACTIC_X_PULL[tacticKey] || 1;
+  const x = clamp(50 + (s.x - 50) * xPull, 4, 96);
+  return { x, y };
+}
+
 function renderPitch(container, formation, assignments, opts) {
   opts = opts || {};
+  const eligibleKeys = opts.eligibleKeys || [];
   container.innerHTML = '';
   const pitch = document.createElement('div');
   pitch.className = 'pitch';
   pitch.innerHTML = '<div class="p-line"></div><div class="p-circle"></div><div class="p-box-top"></div><div class="p-box-bottom"></div>';
   formation.slots.forEach(s => {
     const filled = assignments[s.key];
+    const coord = opts.tactic ? tacticalCoord(s, opts.tactic) : { x: s.x, y: s.y };
+    const isEligible = eligibleKeys.includes(s.key);
+    // Once a slot is filled the pick is final — it's never actionable again.
+    // An empty slot is only actionable when it matches the position of the
+    // player currently awaiting placement. Dimming ("disabled") only makes
+    // sense while a pick IS pending — at rest, every empty slot looks normal.
+    const actionable = opts.interactive && !filled && isEligible;
+    const dimmed = opts.interactive && opts.pendingActive && !filled && !actionable;
     const wrap = document.createElement('div');
-    wrap.className = 'pitch-slot' + (filled ? ' filled' : '') + (opts.interactive ? ' clickable' : '') + (opts.activeKey === s.key ? ' active' : '');
-    wrap.style.left = s.x + '%';
-    wrap.style.top = s.y + '%';
+    wrap.className = 'pitch-slot'
+      + (filled ? ' filled' : '')
+      + (actionable ? ' clickable' : '')
+      + (isEligible ? ' active' : '')
+      + (dimmed ? ' disabled' : '');
+    wrap.style.left = coord.x + '%';
+    wrap.style.top = coord.y + '%';
     wrap.innerHTML = `<div class="ps-dot">${filled ? filled.ovr : s.short}</div><div class="ps-name">${filled ? filled.name : s.label}</div>`;
     if (opts.interactive) wrap.addEventListener('click', () => opts.onSlotClick(s, filled));
     pitch.appendChild(wrap);
@@ -592,10 +752,12 @@ let starters = [];
 let bench = [];
 let draftPhase = 'starters'; // 'starters' | 'bench'
 let currentRoulette = null;
+let draftSquadPool = []; // 3 squads randomly locked in for the whole draft session — keeps the roulette limited
+let chosenStyle = 'eq'; // 'of' | 'eq' | 'def' — picked together with the formation, reshapes its actual slots
 let chosenFormation = null;
 let posCount = { GOL: 0, ZAG: 0, MEI: 0, ATA: 0 };
 let slotAssignments = {}; // slot.key -> drafted player, for the on-pitch diagram
-let activeSlotKey = null; // slot currently being drafted for (starters phase)
+let pendingPlayer = null; // player just picked from the roulette, awaiting a pitch slot (starters phase)
 let draftedSlotAssignments = {};
 
 let opponent = null;      // {label, flag, players: 11 on-pitch}
@@ -631,26 +793,33 @@ function renderFormationScreen() {
   const grid = el('formationGrid');
   grid.innerHTML = '';
   Object.values(FORMATIONS).forEach(f => {
-    const c = formationCounts(f);
+    const styled = styledFormation(f, chosenStyle);
+    const c = styled.counts;
     const card = document.createElement('div');
     card.className = 'formation-card';
-    card.innerHTML = `${miniPitchHTML(f)}<div class="f-name">${f.label}</div><div class="f-breakdown">GOL ${c.GOL} · ZAG ${c.ZAG} · MEI ${c.MEI} · ATA ${c.ATA}</div>`;
+    card.innerHTML = `${miniPitchHTML(styled)}<div class="f-name">${f.label}</div><div class="f-breakdown">GOL ${c.GOL} · ZAG ${c.ZAG} · MEI ${c.MEI} · ATA ${c.ATA}</div>`;
     card.addEventListener('click', () => selectFormation(f.key));
     grid.appendChild(card);
   });
 }
 
+function setStyleButtons(active) {
+  document.querySelectorAll('#styleRow button').forEach(b => {
+    b.classList.toggle('active', b.dataset.style === active);
+  });
+}
+
 function selectFormation(key) {
   SFX.click();
-  chosenFormation = FORMATIONS[key];
-  chosenFormation.counts = formationCounts(chosenFormation);
+  chosenFormation = styledFormation(FORMATIONS[key], chosenStyle);
   posCount = { GOL: 0, ZAG: 0, MEI: 0, ATA: 0 };
   slotAssignments = {};
   starters = [];
   bench = [];
   draftedIds = new Set();
   draftPhase = 'starters';
-  activeSlotKey = chosenFormation.slots[0].key;
+  pendingPlayer = null;
+  draftSquadPool = pickDistinctSquads(3); // lock the roulette to 3 squads for this whole draft
   el('screenFormation').classList.add('hidden');
   el('screenDraft').classList.remove('hidden');
   updateDraftProgress();
@@ -659,14 +828,13 @@ function selectFormation(key) {
 }
 
 // ---------------------------------------------------------------------------
-// DRAFT SCREEN
+// DRAFT SCREEN — pick a player from the roulette first, then place them on
+// any open pitch slot that matches their position. The roulette team only
+// ever changes on an explicit spin (initial draw, "Girar Roleta", or right
+// after a pick/placement moves the draft to its next step).
 // ---------------------------------------------------------------------------
-function currentActiveSlot() {
-  return chosenFormation.slots.find(s => s.key === activeSlotKey) || null;
-}
-
-function nextEmptySlot() {
-  return chosenFormation.slots.find(s => !slotAssignments[s.key]) || null;
+function openSlotsFor(pos) {
+  return chosenFormation.slots.filter(s => s.broad === pos && !slotAssignments[s.key]);
 }
 
 function updateDraftProgress() {
@@ -685,61 +853,105 @@ function updateDraftProgress() {
 function updateSlotHint() {
   const hint = el('slotHint');
   if (draftPhase === 'starters') {
-    const slot = currentActiveSlot();
-    hint.textContent = slot ? `Escalando: ${slot.label} — clique num jogador de ${POS_LABELS[slot.broad]} para preencher essa vaga` : '';
+    hint.textContent = pendingPlayer
+      ? `Escolha a posição de ${pendingPlayer.name} (${POS_LABELS[pendingPlayer.pos]}) — clique numa vaga destacada no campo`
+      : 'Escolha um jogador na roleta abaixo — depois você define a posição dele no campo';
   } else {
     hint.textContent = 'Fase de reservas — qualquer posição, sem vaga fixa no campo';
   }
+
+  const bar = el('pendingPickBar');
+  bar.classList.toggle('hidden', !pendingPlayer);
+  if (pendingPlayer) {
+    el('pendingPickText').innerHTML = `Selecionado: <strong>${pendingPlayer.name}</strong> (${pendingPlayer.pos})`;
+  }
+}
+
+// Releases the pending pick back into the pool — no slot placed, no spin.
+function cancelPendingPlayer() {
+  if (!pendingPlayer) return;
+  SFX.click();
+  draftedIds.delete(pendingPlayer.uid);
+  pendingPlayer = null;
+  renderDraftPitch();
+  renderPlayerGrid();
 }
 
 function renderDraftPitch() {
+  const eligibleKeys = pendingPlayer ? openSlotsFor(pendingPlayer.pos).map(s => s.key) : [];
   renderPitch(el('draftPitchWrap'), chosenFormation, slotAssignments, {
     interactive: draftPhase === 'starters',
-    activeKey: activeSlotKey,
+    eligibleKeys,
+    pendingActive: !!pendingPlayer,
     onSlotClick: (slot, filled) => {
-      SFX.click();
-      if (filled) {
-        removeFromSlot(slot.key);
-      } else {
-        activeSlotKey = slot.key;
-        renderDraftPitch();
-        spinRoulette();
+      // once a player is placed on the pitch the pick is final — filled
+      // slots are no longer clickable/removable. Only an empty, eligible
+      // slot (matching the pending pick's position) can be acted on.
+      if (!filled && pendingPlayer && eligibleKeys.includes(slot.key)) {
+        SFX.click();
+        placePendingPlayer(slot);
       }
-      updateDraftProgress();
     }
   });
   updateSlotHint();
 }
 
-function removeFromSlot(slotKey) {
-  const player = slotAssignments[slotKey];
-  if (!player) return;
-  delete slotAssignments[slotKey];
-  starters = starters.filter(p => p.uid !== player.uid);
-  draftedIds.delete(player.uid);
-  posCount[player.pos]--;
-  draftPhase = 'starters';
-  activeSlotKey = slotKey;
+// Drops the pending pick into the slot the user just clicked, then rolls a
+// fresh team automatically so the next pick is ready to go.
+function placePendingPlayer(slot) {
+  const player = pendingPlayer;
+  player.slot = slot.key;
+  player.slotLabel = slot.label;
+  player.slotShort = slot.short;
+  slotAssignments[slot.key] = player;
+  starters.push(player);
+  posCount[player.pos]++;
+  pendingPlayer = null;
+  if (starters.length === 11) draftPhase = 'bench';
+
+  updateDraftProgress();
   renderDraftPitch();
   spinRoulette();
 }
 
+// Rerolls to a brand-new random squad. Happens on the initial draw, on an
+// explicit "Girar Roleta" click, and automatically right after a pick is
+// resolved (player placed on the pitch, or added straight to the bench) —
+// never as a side effect of merely clicking a slot or opening a position.
 function spinRoulette() {
   SFX.click();
-  const sq = SQUADS[Math.floor(Math.random() * SQUADS.length)];
-  currentRoulette = sq;
+  currentRoulette = draftSquadPool[Math.floor(Math.random() * draftSquadPool.length)];
+  renderPlayerGrid();
+}
+
+// Re-renders the player grid for the CURRENT roulette team (no reroll).
+function renderPlayerGrid() {
+  if (!currentRoulette) { spinRoulette(); return; }
+  el('spinBtn').disabled = !!pendingPlayer;
+  const sq = currentRoulette;
   el('rouletteTeam').textContent = `${sq.flag} ${sq.label}`;
   const grid = el('playerGrid');
   grid.innerHTML = '';
-  const activeSlot = draftPhase === 'starters' ? currentActiveSlot() : null;
   sq.players.forEach((p, i) => {
     const uid = sq.id + '_' + i;
-    const blocked = draftPhase === 'starters' && (!activeSlot || p.pos !== activeSlot.broad);
+    let blocked = draftedIds.has(uid);
+    let blockReason = '';
+    if (!blocked) {
+      if (pendingPlayer) {
+        blocked = true;
+        blockReason = 'Escolha antes a posição do jogador já selecionado, no campo acima';
+      } else if (draftPhase === 'starters' && posCount[p.pos] >= chosenFormation.counts[p.pos]) {
+        blocked = true;
+        blockReason = `Vagas de ${POS_LABELS[p.pos]} esgotadas nessa formação`;
+      } else if (draftPhase === 'bench' && bench.length >= 5) {
+        blocked = true;
+      }
+    }
     const card = document.createElement('div');
-    card.className = 'player-card' + (draftedIds.has(uid) ? ' drafted' : '') + (blocked ? ' pos-full' : '');
+    card.className = 'player-card' + (draftedIds.has(uid) ? ' drafted' : '') + (blocked && !draftedIds.has(uid) ? ' pos-full' : '');
     card.innerHTML = `<div class="pname">${p.name}</div><div class="pmeta"><span>${p.pos}</span><span class="povr">${p.ovr}</span></div>`;
-    if (blocked && activeSlot) card.title = `Essa vaga é de ${POS_LABELS[activeSlot.broad]} (${activeSlot.label})`;
-    if (!draftedIds.has(uid) && !blocked) {
+    if (blockReason) card.title = blockReason;
+    if (!blocked) {
       card.addEventListener('click', () => draftPlayer({ ...p, squadLabel: sq.label, squadFlag: sq.flag, uid }));
     }
     grid.appendChild(card);
@@ -747,39 +959,29 @@ function spinRoulette() {
 }
 
 function draftPlayer(player) {
-  if (draftedIds.has(player.uid)) return;
+  if (draftedIds.has(player.uid) || pendingPlayer) return;
+
   if (draftPhase === 'starters') {
-    const slot = currentActiveSlot();
-    if (!slot || player.pos !== slot.broad) return;
+    if (posCount[player.pos] >= chosenFormation.counts[player.pos]) return;
     draftedIds.add(player.uid);
     SFX.match();
-    player.slot = slot.key;
-    player.slotLabel = slot.label;
-    player.slotShort = slot.short;
-    slotAssignments[slot.key] = player;
-    starters.push(player);
-    posCount[player.pos]++;
-    const next = nextEmptySlot();
-    if (next) {
-      activeSlotKey = next.key;
-    } else {
-      draftPhase = 'bench';
-      activeSlotKey = null;
-    }
-  } else {
-    if (bench.length >= 5) return;
-    draftedIds.add(player.uid);
-    SFX.match();
-    bench.push(player);
+    pendingPlayer = player; // placement happens on the pitch, not here
+    updateDraftProgress();
+    renderDraftPitch();
+    renderPlayerGrid();
+    return;
   }
 
+  if (bench.length >= 5) return;
+  draftedIds.add(player.uid);
+  SFX.match();
+  bench.push(player);
   updateDraftProgress();
-  renderDraftPitch();
 
-  if (draftPhase === 'bench' && bench.length === 5) {
+  if (bench.length === 5) {
     finishDraft();
   } else {
-    spinRoulette(); // each pick consumes the spin — roll again for the next player, now reflecting the current phase/slot
+    spinRoulette(); // fresh team ready for the next bench pick
   }
 }
 
@@ -949,7 +1151,9 @@ function startMatch(oppSquad, stageTag) {
   pendingOutId = null;
   half = 1;
   score = { player: 0, cpu: 0 };
-  selectedTactic = { 1: 'eq', 2: 'eq' };
+  // the match starts with the same posture chosen back when the squad was
+  // built — still freely changeable per half from here on
+  selectedTactic = { 1: chosenStyle, 2: chosenStyle };
 
   el('screenPreMatch').classList.add('hidden');
   el('screenMatch').classList.remove('hidden');
@@ -959,7 +1163,7 @@ function startMatch(oppSquad, stageTag) {
   el('tacticArea').classList.remove('hidden');
   el('tacticLabel').textContent = 'Escolha a postura do 1º tempo';
   el('playHalfBtn').innerHTML = iconSVG('play') + 'Jogar 1º Tempo';
-  setTacticButtons('eq');
+  setTacticButtons(chosenStyle);
   renderVsRow();
   renderScore();
 }
@@ -1009,6 +1213,22 @@ function setTacticButtons(active) {
   document.querySelectorAll('#tacticRow button').forEach(b => {
     b.classList.toggle('active', b.dataset.tactic === active);
   });
+  renderMatchPitch(active);
+}
+
+// Maps onPitch's 11 players back to their formation slot (carried through
+// drafting and subs) so the match pitch can render them positioned exactly
+// like the draft/pre-match screens, then shifted live by the chosen tactic.
+function buildOnPitchAssignments() {
+  const map = {};
+  onPitch.forEach(p => { if (p.slot) map[p.slot] = p; });
+  return map;
+}
+
+function renderMatchPitch(tacticKey) {
+  const wrap = el('matchPitch');
+  if (!wrap || !chosenFormation) return;
+  renderPitch(wrap, chosenFormation, buildOnPitchAssignments(), { interactive: false, tactic: tacticKey || selectedTactic[half] });
 }
 
 // ---------------------------------------------------------------------------
@@ -1138,6 +1358,7 @@ function renderSubPanel() {
       SFX.move();
       renderVsRow();
       renderSubPanel();
+      renderMatchPitch();
     });
     benchList.appendChild(c);
   });
@@ -1207,6 +1428,16 @@ async function finishMatch() {
 // EVENTS
 // ---------------------------------------------------------------------------
 el('spinBtn').addEventListener('click', spinRoulette);
+el('cancelPickBtn').addEventListener('click', cancelPendingPlayer);
+
+document.querySelectorAll('#styleRow button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    SFX.click();
+    chosenStyle = btn.dataset.style;
+    setStyleButtons(chosenStyle);
+    renderFormationScreen(); // live preview: mini-pitches + position breakdown update immediately
+  });
+});
 
 document.querySelectorAll('#tacticRow button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1229,7 +1460,8 @@ el('continueBtn').addEventListener('click', () => { if (onContinue) onContinue()
 
 el('newSquadBtn').addEventListener('click', () => {
   starters = []; bench = []; draftedIds = new Set(); draftPhase = 'starters'; chosenFormation = null;
-  slotAssignments = {}; activeSlotKey = null; draftedSlotAssignments = {};
+  slotAssignments = {}; pendingPlayer = null; draftedSlotAssignments = {};
+  chosenStyle = 'eq'; setStyleButtons('eq');
   tournament = null; currentStageTag = null;
   el('screenMatch').classList.add('hidden');
   el('screenPreMatch').classList.add('hidden');

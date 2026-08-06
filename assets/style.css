@@ -142,8 +142,17 @@ button:focus-visible,
   50% { box-shadow: 0 0 10px var(--accent2), 0 0 22px rgba(var(--accent2-rgb), 0.65); }
 }
 
-.brand span.grad {
-  background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent2));
+/* Slow drifting fade for gradient-text (.grad) — a continuous color blend
+   instead of a static bright gradient. Shared across every page. */
+@keyframes grad-fade {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.grad {
+  background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent2), var(--accent));
+  background-size: 300% 100%;
+  animation: grad-fade 7s ease-in-out infinite;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -209,10 +218,6 @@ main {
 }
 
 .hero h1 .grad {
-  background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   filter: drop-shadow(0 0 16px rgba(var(--accent2-rgb), 0.25));
 }
 
