@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bete La Plus Belle Femme | Salão de Beleza</title>
+    <!-- Fontes Sóbrias e Elegantes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Paleta de Cores Rosé e Neutras */
+        :root {
+            --rose-bg: #FCF9F9; /* Fundo principal super claro */
+            --rose-light: #F4E7E9; /* Detalhes e fundos de seção */
+            --rose-mid: #D4A5B1; /* Botões e destaques */
+            --rose-dark: #9B6A78; /* Títulos e lacinhos */
+            --text-dark: #4A3C40; /* Texto principal mais suave que preto */
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--rose-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            color: var(--rose-dark);
+        }
+
+        /* Cabecalho e Navegação */
+        header {
+            background-color: var(--white);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            display: block;
+            font-size: 12px;
+            font-style: italic;
+            font-weight: 400;
+            text-transform: none;
+            color: var(--rose-mid);
+            margin-top: -5px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--rose-mid);
+        }
+
+        /* Separador de Lacinho Elegante */
+        .bow-separator {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .bow-separator svg {
+            width: 40px;
+            fill: var(--rose-mid);
+        }
+
+        /* Seção Hero (Destaque Principal) */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px 10%;
+            background-color: var(--rose-light);
+        }
+
+        .hero-text {
+            max-width: 50%;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background-color: var(--rose-dark);
+            color: var(--white);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--rose-mid);
+        }
+
+        .hero-image {
+            width: 45%;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 200px 200px 0 0; /* Arco elegante */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Seções Gerais */
+        section {
+            padding: 80px 10%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Serviços */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .service-card {
+            background-color: var(--white);
+            padding: 40px 30px;
+            text-align: center;
+            border-top: 4px solid var(--rose-light);
+            transition: transform 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-top-color: var(--rose-mid);
+        }
+
+        .service-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Colaboradoras */
+        .team {
+            background-color: var(--rose-light);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .team-member img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .team-member h3 {
+            font-size: 1.2rem;
+        }
+
+        .team-member p {
+            font-size: 0.9rem;
+            color: var(--rose-dark);
+            font-style: italic;
+        }
+
+        /* Contato */
+        .contact-container {
+            display: flex;
+            gap: 50px;
+            margin-top: 50px;
+        }
+
+        .contact-info, .contact-form {
+            flex: 1;
+        }
+
+        .contact-info p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--rose-mid);
+            background-color: var(--rose-bg);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .contact-form textarea {
+            height: 150px;
+            resize: none;
+        }
+
+        /* Rodapé */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--white);
+            font-size: 0.9rem;
+            color: var(--rose-dark);
+            border-top: 1px solid var(--rose-light);
+        }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .hero { flex-direction: column; text-align: center; padding: 40px 5%; }
+            .hero-text { max-width: 100%; margin-bottom: 40px; }
+            .hero-image { width: 80%; }
+            .services-grid, .team-grid, .contact-container { grid-template-columns: 1fr; flex-direction: column; }
+            header { flex-direction: column; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            Bete 
+            <span>La plus belle femme</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#colaboradoras">Colaboradoras</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="inicio" class="hero">
+        <div class="hero-text">
+            <h1>Descubra a sua versão mais bela.</h1>
+            <p>Um espaço refinado, dedicado ao cuidado, à beleza e ao bem-estar. Venha viver uma experiência inesquecível em nosso salão.</p>
+            <a href="#contato" class="btn">Agende seu horário</a>
+        </div>
+        <div class="hero-image">
+            <!-- Imagem de loira elegante -->
+            <img src="https://images.unsplash.com/photo-1620331311520-246422fd82f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Mulher loira no salão de beleza">
+        </div>
+    </section>
+
+    <!-- Detalhe do Lacinho -->
+    <div class="bow-separator">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 11.5c-1.5-1.5-3-3-5.5-3C4 8.5 2 10.5 2 13c0 2.5 2 4.5 4.5 4.5 2 0 4-1.5 5.5-3 1.5 1.5 3.5 3 5.5 3 2.5 0 4.5-2 4.5-4.5 0-2.5-2-4.5-4.5-4.5-2.5 0-4 1.5-5.5 3zM6.5 15.5C5 15.5 4 14.3 4 13c0-1.3 1-2.5 2.5-2.5 1.8 0 3 1.5 4 2.5-1-1-2.2-2.5-4-2.5zm11 0c-1.8 0-3-1.5-4-2.5 1 1 2.2 2.5 4 2.5 1.5 0 2.5-1.2 2.5-2.5 0-1.3-1-2.5-2.5-2.5-1.5 0-2.5 1.2-2.5 2.5zM12 14c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>
+        </svg>
+    </div>
+
+    <section id="servicos">
+        <h2 class="section-title">Nossos Serviços</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <!-- Foto ilustrativa -->
+                <img src="https://images.unsplash.com/photo-1595476108010-b4d1f10d5e42?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Corte e Coloração">
+                <h3>Corte & Coloração</h3>
+                <p>Especialistas em loiros perfeitos, mechas e cortes que valorizam o seu rosto e a sua personalidade.</p>
+            </div>
+            <div class="service-card">
+                <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Maquiagem">
+                <h3>Maquiagem</h3>
+                <p>Produções refinadas para noivas, formandas e eventos especiais, realçando sua beleza natural.</p>
+            </div>
+            <div class="service-card">
+                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Tratamentos">
+                <h3>Tratamentos</h3>
+                <p>Spas capilares, hidratações profundas e cronogramas para manter seus fios saudáveis e brilhantes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detalhe do Lacinho -->
+    <div class="bow-separator">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 11.5c-1.5-1.5-3-3-5.5-3C4 8.5 2 10.5 2 13c0 2.5 2 4.5 4.5 4.5 2 0 4-1.5 5.5-3 1.5 1.5 3.5 3 5.5 3 2.5 0 4.5-2 4.5-4.5 0-2.5-2-4.5-4.5-4.5-2.5 0-4 1.5-5.5 3z"/>
+        </svg>
+    </div>
+
+    <section id="colaboradoras" class="team">
+        <h2 class="section-title">Nossas Colaboradoras</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Colaboradora 1">
+                <h3>Bete</h3>
+                <p>Fundadora & Colorimetrista</p>
+            </div>
+            <div class="team-member">
+                <img src="https://images.unsplash.com/photo-1543132220-3ec99c6094dc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Colaboradora 2">
+                <h3>Camila</h3>
+                <p>Especialista em Loiros</p>
+            </div>
+            <div class="team-member">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Colaboradora 3">
+                <h3>Sofia</h3>
+                <p>Makeup Artist</p>
+            </div>
+            <div class="team-member">
+                <img src="https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Colaboradora 4">
+                <h3>Juliana</h3>
+                <p>Hairstylist</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detalhe do Lacinho -->
+    <div class="bow-separator">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 11.5c-1.5-1.5-3-3-5.5-3C4 8.5 2 10.5 2 13c0 2.5 2 4.5 4.5 4.5 2 0 4-1.5 5.5-3 1.5 1.5 3.5 3 5.5 3 2.5 0 4.5-2 4.5-4.5 0-2.5-2-4.5-4.5-4.5-2.5 0-4 1.5-5.5 3z"/>
+        </svg>
+    </div>
+
+    <section id="contato">
+        <h2 class="section-title">Entre em Contato</h2>
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Venha nos visitar</h3>
+                <br>
+                <p><strong>Endereço:</strong> Rua das Flores, 123 - Bairro Nobre</p>
+                <p><strong>Telefone:</strong> (11) 99999-0000</p>
+                <p><strong>E-mail:</strong> contato@betelaplusbelle.com.br</p>
+                <br>
+                <h3>Horário de Funcionamento</h3>
+                <p>Terça a Sábado: 09h às 19h</p>
+            </div>
+            <div class="contact-form">
+                <form action="#" method="POST">
+                    <input type="text" placeholder="Seu Nome" required>
+                    <input type="email" placeholder="Seu E-mail" required>
+                    <textarea placeholder="Como podemos ajudar?" required></textarea>
+                    <button type="submit" class="btn">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Bete La Plus Belle Femme. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
