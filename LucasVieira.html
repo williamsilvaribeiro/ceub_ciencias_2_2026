@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World's Best Games</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              purple: '#8B5CF6',
+              neon: '#06B6D4',
+              gold: '#EAB308',
+              dark: '#090713',
+              card: '#120f24'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar & Animations */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #090713; }
+    ::-webkit-scrollbar-thumb { background: #1e1b3a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-[#090713] text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white">
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden items-center gap-3 bg-purple-950/90 border border-purple-500/50 text-purple-200 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md transition-all">
+    <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
+    <span id="toast-message" class="font-medium text-sm"></span>
+  </div>
+
+  <!-- HEADER / NAVIGATION -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#090713]/80 border-b border-purple-900/30 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- LOGO -->
+      <button onclick="navigate('home')" class="flex items-center gap-2 group text-left">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-purple-500 to-cyan-400 p-0.5 shadow-lg shadow-purple-600/30">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <i data-lucide="trophy" class="w-5 h-5 text-purple-400"></i>
+          </div>
+        </div>
+        <div>
+          <span class="text-lg font-black tracking-wider bg-gradient-to-r from-purple-400 via-cyan-400 to-amber-300 bg-clip-text text-transparent uppercase block leading-none">
+            World’s Best
+          </span>
+          <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">Games</span>
+        </div>
+      </button>
+
+      <!-- SEARCH BAR -->
+      <div class="relative flex-1 max-w-md hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+          <input
+            id="search-input"
+            type="text"
+            oninput="handleSearch(this.value)"
+            placeholder="Buscar jogos por nome ou gênero..."
+            className="w-full bg-slate-900/90 border border-slate-800 rounded-full pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition"
+          />
+        </div>
+        <div id="search-popover" class="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 hidden"></div>
+      </div>
+
+      <!-- NAV BUTTONS -->
+      <nav class="flex items-center gap-2">
+        <button id="nav-home" onclick="navigate('home')" class="px-3 py-2 rounded-lg text-sm font-medium transition text-slate-400 hover:text-white">Início</button>
+        <button id="nav-top100" onclick="navigate('top100')" class="px-3 py-2 rounded-lg text-sm font-medium transition text-slate-400 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i> Top 100
+        </button>
+        <button id="nav-profile" onclick="navigate('profile')" class="px-3 py-2 rounded-lg text-sm font-medium transition text-slate-400 hover:text-white flex items-center gap-2">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>Perfil</span>
+          <span id="wishlist-badge" class="bg-purple-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+
+    <!-- VIEW: HOME -->
+    <section id="view-home" class="space-y-12">
+      <!-- HERO CAROUSEL BANNER -->
+      <div id="hero-container" class="relative rounded-3xl overflow-hidden h-[420px] bg-slate-950 border border-purple-900/40 shadow-2xl"></div>
+
+      <!-- GENRE FILTERS -->
+      <div class="space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="filter" class="w-5 h-5 text-purple-400"></i> Explorar Jogos
+          </h2>
+          <div id="genre-buttons" class="flex items-center gap-2 overflow-x-auto no-scrollbar"></div>
+        </div>
+
+        <!-- GAME GRID -->
+        <div id="game-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- VIEW: TOP 100 -->
+    <section id="view-top100" class="space-y-6 hidden">
+      <div class="p-8 rounded-3xl bg-gradient-to-r from-purple-900/40 via-cyan-900/20 to-slate-900 border border-purple-800/30">
+        <h1 class="text-3xl font-black text-white">Top 100 Ranking</h1>
+        <p class="text-slate-400 text-sm">Os títulos mais aclamados ordenados por nota do Metacritic.</p>
+      </div>
+      <div id="top100-list" class="space-y-3"></div>
+    </section>
+
+    <!-- VIEW: GAME DETAIL -->
+    <section id="view-detail" class="space-y-8 hidden">
+      <div id="detail-header" class="relative rounded-3xl overflow-hidden min-h-[320px] bg-slate-950 border border-slate-800 p-6 flex flex-col md:flex-row items-end gap-6"></div>
+      
+      <!-- DETAILS TABS -->
+      <div class="border-b border-slate-800 flex gap-6">
+        <button id="tab-btn-overview" onclick="switchDetailTab('overview')" class="pb-3 text-sm font-bold border-b-2 border-purple-500 text-purple-400">Visão Geral</button>
+        <button id="tab-btn-specs" onclick="switchDetailTab('specs')" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white">Requisitos de PC</button>
+      </div>
+
+      <div id="detail-tab-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-8"></div>
+      <div id="detail-tab-specs" class="space-y-6 hidden"></div>
+    </section>
+
+    <!-- VIEW: PROFILE -->
+    <section id="view-profile" class="space-y-8 hidden">
+      <div class="p-8 rounded-3xl bg-slate-900/80 border border-purple-900/30 flex items-center gap-6">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-cyan-400 p-1">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover rounded-[12px]" />
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-white">Meu Perfil Gamer</h2>
+          <p class="text-xs text-slate-400">Gerencie seus jogos salvos e histórico.</p>
+        </div>
+      </div>
+      <div id="profile-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 border-t border-purple-900/20 bg-[#06040d] py-8 text-center text-xs text-slate-500">
+    <p>© 2026 World's Best Games — Aplicação Web em HTML Autônomo.</p>
+  </footer>
+
+  <!-- APPLICATION SCRIPT -->
+  <script>
+    // MOCK DATA
+    const GAMES = [
+      {
+        id: 'elden-ring',
+        title: 'Elden Ring',
+        tagline: 'Levante-se, Maculado, e seja guiado pela graça.',
+        cover: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1600&auto=format&fit=crop',
+        rating: 4.9,
+        metacritic: 96,
+        genres: ['RPG', 'Ação'],
+        year: 2022,
+        developer: 'FromSoftware',
+        description: 'Nas Terras Intermédias governadas pela Rainha Marika, a Eterna, o Anel de Elden foi destruído. Uma jornada épica e sombria num mundo aberto sem precedentes.',
+        trailer: 'https://www.youtube.com/embed/E3Huy2cdih0',
+        stores: [
+          { name: 'Steam', price: 'R$ 229,90', url: 'https://store.steampowered.com' },
+          { name: 'PlayStation Store', price: 'R$ 299,90', url: 'https://store.playstation.com' }
+        ],
+        specs: {
+          os: 'Windows 10/11 64-bit',
+          cpu: 'Intel Core i7-8700K / AMD Ryzen 5 3600X',
+          gpu: 'NVIDIA GeForce GTX 1070 8GB / AMD Radeon RX VEGA 56',
+          ram: '16 GB RAM',
+          storage: '60 GB SSD'
+        }
+      },
+      {
+        id: 'baldurs-gate-3',
+        title: "Baldur's Gate 3",
+        tagline: 'Reúna seu grupo e retorne às Reinos Esquecidos.',
+        cover: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1600&auto=format&fit=crop',
+        rating: 4.95,
+        metacritic: 96,
+        genres: ['RPG', 'Estratégia'],
+        year: 2023,
+        developer: 'Larian Studios',
+        description: 'Um RPG de próxima geração ambientado no universo de Dungeons & Dragons com liberdade absoluta de escolhas e narrativa ramificada.',
+        trailer: 'https://www.youtube.com/embed/1T22wNvoPart',
+        stores: [
+          { name: 'Steam', price: 'R$ 199,99', url: 'https://store.steampowered.com' },
+          { name: 'GOG', price: 'R$ 199,99', url: 'https://www.gog.com' }
+        ],
+        specs: {
+          os: 'Windows 10/11 64-bit',
+          cpu: 'Intel i7 8700K / AMD r5 3600',
+          gpu: 'Nvidia RTX 2060 Super / RX 5700 XT',
+          ram: '16 GB RAM',
+          storage: '150 GB SSD'
+        }
+      },
+      {
+        id: 'god-of-war-ragnarok',
+        title: 'God of War Ragnarök',
+        tagline: 'O destino de todos os reinos está em jogo.',
+        cover: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=800&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
+        rating: 4.8,
+        metacritic: 94,
+        genres: ['Ação', 'Aventura'],
+        year: 2022,
+        developer: 'Santa Monica Studio',
+        description: 'Junte-se a Kratos e Atreus em uma jornada mítica por respostas antes que o Ragnarök aconteça.',
+        trailer: 'https://www.youtube.com/embed/hfJ4Km46A-0',
+        stores: [
+          { name: 'PlayStation Store', price: 'R$ 299,90', url: 'https://store.playstation.com' },
+          { name: 'Steam', price: 'R$ 249,90', url: 'https://store.steampowered.com' }
+        ],
+        specs: {
+          os: 'Windows 10 64-bit',
+          cpu: 'Intel i5-8600 / AMD Ryzen 5 3600',
+          gpu: 'NVIDIA RTX 2060 Super / AMD RX 5700',
+          ram: '16 GB RAM',
+          storage: '190 GB SSD'
+        }
+      }
+    ];
+
+    // STATE
+    let state = {
+      view: 'home',
+      selectedGameId: 'elden-ring',
+      selectedGenre: 'Todos',
+      wishlist: ['elden-ring'],
+      played: ['god-of-war-ragnarok']
+    };
+
+    // TOAST SYSTEM
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').innerText = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 3000);
+    }
+
+    // WISHLIST TOGGLE
+    function toggleWishlist(gameId) {
+      if (state.wishlist.includes(gameId)) {
+        state.wishlist = state.wishlist.filter(id => id !== gameId);
+        showToast('Removido da Wishlist');
+      } else {
+        state.wishlist.push(gameId);
+        showToast('Adicionado à Wishlist!');
+      }
+      updateWishlistBadge();
+      renderCurrentView();
+    }
+
+    function updateWishlistBadge() {
+      const badge = document.getElementById('wishlist-badge');
+      if (state.wishlist.length > 0) {
+        badge.innerText = state.wishlist.length;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // NAVIGATION
+    function navigate(viewName, gameId = null) {
+      state.view = viewName;
+      if (gameId) state.selectedGameId = gameId;
+
+      // Update Nav active styling
+      ['home', 'top100', 'profile'].forEach(v => {
+        const btn = document.getElementById(`nav-${v}`);
+        if (btn) {
+          if (v === viewName) {
+            btn.className = "px-3 py-2 rounded-lg text-sm font-medium bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center gap-1.5";
+          } else {
+            btn.className = "px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5";
+          }
+        }
+      });
+
+      // Toggle View Sections
+      document.getElementById('view-home').classList.toggle('hidden', viewName !== 'home');
+      document.getElementById('view-top100').classList.toggle('hidden', viewName !== 'top100');
+      document.getElementById('view-detail').classList.toggle('hidden', viewName !== 'detail');
+      document.getElementById('view-profile').classList.toggle('hidden', viewName !== 'profile');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderCurrentView();
+    }
+
+    function renderCurrentView() {
+      if (state.view === 'home') renderHome();
+      if (state.view === 'top100') renderTop100();
+      if (state.view === 'detail') renderDetail();
+      if (state.view === 'profile') renderProfile();
+      lucide.createIcons();
+    }
+
+    // RENDER HOME
+    function renderHome() {
+      const heroGame = GAMES[0];
+      const heroContainer = document.getElementById('hero-container');
+      heroContainer.innerHTML = `
+        <img src="${heroGame.banner}" class="absolute inset-0 w-full h-full object-cover opacity-40" />
+        <div class="absolute inset-0 bg-gradient-to-t from-[#090713] via-[#090713]/60 to-transparent"></div>
+        <div class="relative z-10 h-full p-8 flex flex-col justify-end space-y-3">
+          <span class="text-xs font-bold font-mono px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 w-max">★ Metascore ${heroGame.metacritic}</span>
+          <h1 class="text-4xl font-black text-white">${heroGame.title}</h1>
+          <p class="text-slate-300 text-sm max-w-xl line-clamp-2">${heroGame.description}</p>
+          <button onclick="navigate('detail', '${heroGame.id}')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs w-max shadow-lg shadow-purple-600/30">
+            Ver Detalhes do Jogo
+          </button>
+        </div>
+      `;
+
+      // Genres
+      const genres = ['Todos', 'RPG', 'Ação', 'Aventura', 'Estratégia'];
+      const genreButtons = document.getElementById('genre-buttons');
+      genreButtons.innerHTML = genres.map(g => `
+        <button onclick="state.selectedGenre='${g}'; renderHome();" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${state.selectedGenre === g ? 'bg-purple-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}">
+          ${g}
+        </button>
+      `).join('');
+
+      // Grid
+      const filtered = state.selectedGenre === 'Todos' ? GAMES : GAMES.filter(g => g.genres.includes(state.selectedGenre));
+      const gameGrid = document.getElementById('game-grid');
+      gameGrid.innerHTML = filtered.map(g => renderGameCard(g)).join('');
+    }
+
+    // CARD COMPONENT
+    function renderGameCard(g) {
+      const isWish = state.wishlist.includes(g.id);
+      return `
+        <div class="rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 overflow-hidden transition group flex flex-col">
+          <div class="relative h-48 cursor-pointer" onclick="navigate('detail', '${g.id}')">
+            <img src="${g.cover}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+            <button onclick="event.stopPropagation(); toggleWishlist('${g.id}')" class="absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md ${isWish ? 'bg-rose-500 text-white' : 'bg-slate-900/80 text-slate-400 hover:text-white'}">
+              <i data-lucide="heart" class="w-4 h-4 ${isWish ? 'fill-current' : ''}"></i>
+            </button>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <span class="text-[10px] font-mono text-cyan-400 font-bold">${g.genres.join(', ')}</span>
+              <h3 onclick="navigate('detail', '${g.id}')" class="text-base font-bold text-white hover:text-purple-400 cursor-pointer">${g.title}</h3>
+            </div>
+            <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+              <span class="text-amber-400 font-bold">★ ${g.rating}</span>
+              <button onclick="navigate('detail', '${g.id}')" class="text-purple-400 font-bold hover:underline">Ver Mais</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // RENDER TOP 100
+    function renderTop100() {
+      const list = document.getElementById('top100-list');
+      const sorted = [...GAMES].sort((a,b) => b.metacritic - a.metacritic);
+      list.innerHTML = sorted.map((g, idx) => `
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center gap-4 hover:border-purple-500/40 transition">
+          <span class="font-mono font-bold text-lg text-purple-400 w-8">#${idx + 1}</span>
+          <img src="${g.cover}" class="w-14 h-16 object-cover rounded-xl cursor-pointer" onclick="navigate('detail', '${g.id}')" />
+          <div class="flex-1">
+            <h4 class="font-bold text-white cursor-pointer hover:text-purple-400" onclick="navigate('detail', '${g.id}')">${g.title}</h4>
+            <p class="text-xs text-slate-400">${g.developer} • ${g.year}</p>
+          </div>
+          <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs">Metascore ${g.metacritic}</span>
+        </div>
+      `).join('');
+    }
+
+    // RENDER DETAIL
+    function renderDetail() {
+      const g = GAMES.find(game => game.id === state.selectedGameId) || GAMES[0];
+      const isWish = state.wishlist.includes(g.id);
+
+      document.getElementById('detail-header').innerHTML = `
+        <img src="${g.cover}" class="w-32 h-44 object-cover rounded-2xl border-2 border-purple-500/30 shadow-2xl relative z-10" />
+        <div class="space-y-2 relative z-10 flex-1">
+          <span class="text-xs font-mono text-cyan-400 font-bold">${g.developer} • ${g.year}</span>
+          <h1 class="text-3xl font-black text-white">${g.title}</h1>
+          <p class="text-slate-300 text-xs italic">${g.tagline}</p>
+          <div class="pt-2 flex gap-3">
+            <button onclick="toggleWishlist('${g.id}')" class="px-4 py-2 rounded-xl border ${isWish ? 'bg-rose-500/20 border-rose-500 text-rose-300' : 'bg-slate-900 border-slate-700 text-slate-300'} text-xs font-bold flex items-center gap-2">
+              <i data-lucide="heart" class="w-4 h-4 ${isWish ? 'fill-current text-rose-500' : ''}"></i>
+              ${isWish ? 'Na Wishlist' : 'Adicionar à Wishlist'}
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('detail-tab-overview').innerHTML = `
+        <div class="lg:col-span-2 space-y-6">
+          <p class="text-slate-300 text-sm leading-relaxed">${g.description}</p>
+          <div class="space-y-2">
+            <h3 class="font-bold text-white text-sm">Trailer Oficial</h3>
+            <div class="aspect-video w-full rounded-2xl overflow-hidden border border-slate-800">
+              <iframe src="${g.trailer}" class="w-full h-full" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+            <h4 class="font-bold text-white text-sm">Onde Comprar</h4>
+            ${g.stores.map(s => `
+              <a href="${s.url}" target="_blank" class="flex justify-between p-3 rounded-xl bg-slate-800/60 hover:bg-purple-900/30 text-xs font-semibold text-slate-200 transition">
+                <span>${s.name}</span>
+                <span class="text-amber-400 font-mono">${s.price}</span>
+              </a>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('detail-tab-specs').innerHTML = `
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 max-w-2xl space-y-3 text-xs text-slate-300">
+          <h3 class="font-bold text-white text-sm mb-4">Recomendados (PC)</h3>
+          <p><strong>SO:</strong> ${g.specs.os}</p>
+          <p><strong>Processador:</strong> ${g.specs.cpu}</p>
+          <p><strong>Placa de Vídeo:</strong> ${g.specs.gpu}</p>
+          <p><strong>Memória RAM:</strong> ${g.specs.ram}</p>
+          <p><strong>Armazenamento:</strong> ${g.specs.storage}</p>
+        </div>
+      `;
+    }
+
+    function switchDetailTab(tab) {
+      document.getElementById('detail-tab-overview').classList.toggle('hidden', tab !== 'overview');
+      document.getElementById('detail-tab-specs').classList.toggle('hidden', tab !== 'specs');
+      document.getElementById('tab-btn-overview').className = `pb-3 text-sm font-bold border-b-2 ${tab === 'overview' ? 'border-purple-500 text-purple-400' : 'border-transparent text-slate-400'}`;
+      document.getElementById('tab-btn-specs').className = `pb-3 text-sm font-bold border-b-2 ${tab === 'specs' ? 'border-purple-500 text-purple-400' : 'border-transparent text-slate-400'}`;
+    }
+
+    // RENDER PROFILE
+    function renderProfile() {
+      const grid = document.getElementById('profile-grid');
+      const wishlisted = GAMES.filter(g => state.wishlist.includes(g.id));
+      if (wishlisted.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 text-sm">Sua lista de desejos está vazia.</div>`;
+      } else {
+        grid.innerHTML = wishlisted.map(g => renderGameCard(g)).join('');
+      }
+    }
+
+    // SEARCH HANDLE
+    function handleSearch(query) {
+      const popover = document.getElementById('search-popover');
+      if (!query.trim()) {
+        popover.classList.add('hidden');
+        return;
+      }
+      const matches = GAMES.filter(g => g.title.toLowerCase().includes(query.toLowerCase()));
+      if (matches.length > 0) {
+        popover.innerHTML = matches.map(g => `
+          <div onclick="navigate('detail', '${g.id}'); document.getElementById('search-popover').classList.add('hidden');" class="p-3 hover:bg-purple-900/30 flex items-center gap-3 cursor-pointer border-b border-slate-800 last:border-0">
+            <img src="${g.cover}" class="w-10 h-12 object-cover rounded" />
+            <div>
+              <h5 class="font-bold text-xs text-white">${g.title}</h5>
+              <p class="text-[10px] text-slate-400">${g.developer}</p>
+            </div>
+          </div>
+        `).join('');
+        popover.classList.remove('hidden');
+      } else {
+        popover.innerHTML = `<div class="p-3 text-xs text-slate-500 text-center">Nenhum resultado.</div>`;
+        popover.classList.remove('hidden');
+      }
+    }
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCurrentView();
+    });
+  </script>
+</body>
+</html>
