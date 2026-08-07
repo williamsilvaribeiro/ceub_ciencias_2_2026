@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>William Arena — Lucas Amaral Evangelista</title>
+<meta name="description" content="Site de games, eSports e hardware com arcade jogável. Trabalho de Desenvolvimento Web — CEUB 2026.2.">
+<meta name="author" content="Lucas Amaral Evangelista">
+
+<!-- Segue a convenção do repositório (uma página por aluno na raiz). Como o
+     projeto tem HTML, CSS e JS em arquivos separados, ele vive na pasta
+     lucas_amaral/ e esta página é a porta de entrada. -->
+<meta http-equiv="refresh" content="3; url=lucas_amaral/index.html">
+<link rel="canonical" href="lucas_amaral/index.html">
+
+<style>
+  :root { --bg:#080A14; --card:#0E1120; --line:#232842; --text:#EEF1FF;
+          --muted:#98A0BF; --violet:#7C4DFF; --cyan:#22E0F0; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px;
+         background:var(--bg); color:var(--text);
+         font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; line-height:1.6; }
+  .box { position:relative; max-width:520px; width:100%; text-align:center;
+         background:linear-gradient(180deg,#141828,var(--card));
+         border:1px solid var(--line); padding:48px 36px; }
+  .box::before, .box::after { content:""; position:absolute; width:22px; height:22px; }
+  .box::before { left:0; top:0; border-top:2px solid var(--violet); border-left:2px solid var(--violet); }
+  .box::after { right:0; bottom:0; border-bottom:2px solid var(--cyan); border-right:2px solid var(--cyan); }
+  .tag { font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--cyan);
+         margin:0 0 18px; }
+  h1 { font-size:30px; letter-spacing:-.03em; margin:0 0 14px; }
+  p { color:var(--muted); font-size:15px; margin:0 0 28px; }
+  a.btn { display:inline-block; padding:14px 28px; color:#fff; font-weight:700; font-size:15px;
+          text-decoration:none; background:linear-gradient(135deg,var(--violet),#6D3BF5); }
+  a.btn:hover { background:linear-gradient(135deg,#A78BFF,var(--violet)); }
+  small { display:block; margin-top:26px; font-size:12px; color:#5E668A; }
+</style>
+</head>
+<body>
+  <main class="box">
+    <p class="tag">Desenvolvimento Web · CEUB 2026.2</p>
+    <h1>William Arena</h1>
+    <p>Site de games, eSports e hardware, com três jogos jogáveis direto no navegador —
+       Snake, Breakout e Jogo da Memória. HTML, CSS e JavaScript puros.</p>
+    <a class="btn" href="lucas_amaral/index.html">Abrir o site →</a>
+    <small>Lucas Amaral Evangelista · RA 22508120<br>
+      Redirecionando em 3 segundos.</small>
+  </main>
+</body>
+</html>
