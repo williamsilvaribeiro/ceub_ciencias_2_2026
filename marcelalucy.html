@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Cabelitos | Beleza & Charme 💖</title>
+    
+    <!-- AQUI COMEÇA O CSS (ESTILOS E CORES) -->
+    <style>
+        /* Paleta de Cores e Variáveis */
+        :root {
+            --rosa-choque: #ff66b2;
+            --rosa-claro: #ffe6f2;
+            --roxo-brilhante: #9933ff;
+            --roxo-claro: #f2e6ff;
+            --texto-escuro: #4a154b;
+            --branco: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--rosa-claro), var(--roxo-claro));
+            color: var(--texto-escuro);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ================= NAV BAR ================= */
+        #navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #navbar.rolagem {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(153, 51, 255, 0.1);
+            padding: 15px 50px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--roxo-brilhante);
+            text-shadow: 1px 1px 2px var(--rosa-choque);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--texto-escuro);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--rosa-choque);
+        }
+
+        /* ================= BOTOES ================= */
+        button {
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-nav {
+            background: var(--branco);
+            color: var(--roxo-brilhante);
+            border: 2px solid var(--roxo-brilhante);
+            padding: 10px 25px;
+            font-size: 1rem;
+        }
+
+        .btn-nav:hover {
+            background: var(--roxo-brilhante);
+            color: var(--branco);
+        }
+
+        .btn-primario {
+            background: linear-gradient(45deg, var(--rosa-choque), var(--roxo-brilhante));
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(255, 102, 178, 0.5);
+        }
+
+        .btn-primario:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 10px 30px rgba(153, 51, 255, 0.7);
+        }
+
+        .btn-secundario {
+            background: transparent;
+            color: var(--roxo-brilhante);
+            border: 2px solid var(--roxo-brilhante);
+            padding: 15px 35px;
+            font-size: 1.2rem;
+        }
+
+        .btn-secundario:hover {
+            background: rgba(153, 51, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* ================= HERO SECTION ================= */
+        .hero-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding: 120px 50px 50px 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .tag-novidade {
+            display: inline-block;
+            background: var(--branco);
+            color: var(--rosa-choque);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(255, 102, 178, 0.2);
+        }
+
+        h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            color: var(--roxo-brilhante);
+        }
+
+        .destaque {
+            color: transparent;
+            background: linear-gradient(45deg, var(--rosa-choque), var(--roxo-brilhante));
+            -webkit-background-clip: text;
+            text-shadow: none;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .hero-botoes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .prova-social {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 5px solid var(--rosa-choque);
+            font-size: 0.95rem;
+        }
+
+        /* ================= HERO VISUAL ================= */
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .circulo-magico {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, var(--rosa-choque), var(--roxo-brilhante));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(153, 51, 255, 0.4);
+            animation: pulsar 4s infinite alternate ease-in-out;
+        }
+
+        .emoji-gigante {
+            font-size: 150px;
+        }
+
+        /* Selos flutuantes ao redor do círculo */
+        .selo-flutuante {
+            position: absolute;
+            background: var(--branco);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: var(--roxo-brilhante);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            animation: flutuar 3s infinite alternate ease-in-out;
+        }
+
+        .selo-1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .selo-2 { bottom: 15%; left: 10%; animation-delay: 1s; }
+        .selo-3 { top: 40%; right: 5%; animation-delay: 2s; }
+
+        /* Animações */
+        @keyframes pulsar {
+            0% { transform: scale(1); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            100% { transform: scale(1.05); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+
+        @keyframes flutuar {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-15px); }
+        }
+
+        /* Responsividade Básica */
+        @media (max-width: 900px) {
+            .hero-section { flex-direction: column; text-align: center; padding-top: 150px; }
+            .hero-botoes { justify-content: center; flex-wrap: wrap; }
+            .hero-visual { margin-top: 50px; }
+            .prova-social { text-align: left; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= CONTEÚDO HTML ================= -->
+    
+    <!-- Barra de Navegação -->
+    <nav id="navbar">
+        <div class="logo">💅 Cabelitos 🎀</div>
+        <ul class="nav-links">
+            <li><a href="#">Início 🏠</a></li>
+            <li><a href="#">Serviços 💇‍♀️</a></li>
+            <li><a href="#">Galeria 📸</a></li>
+        </ul>
+        <button class="btn-nav" id="btnMenu">Agendar ✨</button>
+    </nav>
+
+    <!-- Seção Hero Principal -->
+    <section class="hero-section">
+        
+        <!-- Lado Esquerdo: Textos e Botões -->
+        <div class="hero-text">
+            <span class="tag-novidade">🌟 Novidade: Banho de Brilho Diamante!</span>
+            
+            <h1>Desperte a <span class="destaque">Diva</span> que há em você! 👑💖</h1>
+            
+            <p>Cortes 💇‍♀️, Penteados 💆‍♀️, Unhas 💅 e muita fofura no melhor salão da cidade. Seu momento de autocuidado com o glamour que você merece! 🥰🛍️</p>
+            
+            <div class="hero-botoes">
+                <button id="btnPrincipal" class="btn-primario">Agendar meu Momento! ✨</button>
+                <button class="btn-secundario">Ver nossos Cortes 👀</button>
+            </div>
+
+            <div class="prova-social">
+                <p>⭐⭐⭐⭐⭐ "Saí me sentindo uma princesa! Recomendo muito!" <br><em>— Julia, 22 anos 🌸</em></p>
+            </div>
+        </div>
+        
+        <!-- Lado Direito: Elementos Visuais e Emojis -->
+        <div class="hero-visual">
+            <div class="circulo-magico">
+                <span class="emoji-gigante">💃</span>
+            </div>
+            
+            <!-- Selos flutuantes -->
+            <div class="selo-flutuante selo-1">💅 Unhas em Gel</div>
+            <div class="selo-flutuante selo-2">💆‍♀️ Spa Capilar</div>
+            <div class="selo-flutuante selo-3">💄 Make Profissional</div>
+        </div>
+        
+    </section>
+
+    <!-- ================= AQUI COMEÇA O JAVASCRIPT ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- EFEITO DO MENU AO ROLAR A PÁGINA ---
+            const navbar = document.getElementById('navbar');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('rolagem');
+                } else {
+                    navbar.classList.remove('rolagem');
+                }
+            });
+
+            // --- ANIMAÇÃO DOS BOTÕES (CHUVA DE EMOJIS) ---
+            const btnPrincipal = document.getElementById('btnPrincipal');
+            const btnMenu = document.getElementById('btnMenu');
+            
+            function dispararEmojis() {
+                // Cria uma chuva de emojis na tela
+                for(let i = 0; i < 30; i++) {
+                    setTimeout(criarEmojiAnimado, i * 50);
+                }
+            }
+
+            btnPrincipal.addEventListener('click', dispararEmojis);
+            btnMenu.addEventListener('click', dispararEmojis);
+
+            function criarEmojiAnimado() {
+                const elemento = document.createElement('div');
+                const emojis = ['💖', '✨', '🎀', '🌸', '👑', '💅'];
+                elemento.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // Estilização inicial do emoji criado
+                elemento.style.position = 'fixed'; 
+                elemento.style.fontSize = Math.random() * 25 + 15 + 'px';
+                elemento.style.left = Math.random() * 100 + 'vw';
+                elemento.style.top = '100vh'; 
+                elemento.style.pointerEvents = 'none';
+                elemento.style.zIndex = '9999';
+                elemento.style.transition = 'transform 2s ease-out, opacity 2s ease-out, top 2s ease-out';
+                
+                document.body.appendChild(elemento);
+                
+                // Força a renderização antes de animar
+                requestAnimationFrame(() => {
+                    elemento.style.top = (Math.random() * 50) + 'vh'; 
+                    elemento.style.transform = `scale(${Math.random() + 1}) rotate(${Math.random() * 360}deg)`;
+                    elemento.style.opacity = '0';
+                });
+
+                // Limpa o DOM após a animação
+                setTimeout(() => {
+                    elemento.remove();
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
